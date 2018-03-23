@@ -6,6 +6,16 @@ type Trip struct {
 	DepartureTime int64 `json:"departure_time"`
 }
 
-// func (trip Trip) ValidateOrigin(origin string) bool {
-// 	return true
-// }
+func (trip Trip) ValidateOrigin(origin string) bool {
+	if origin != "" {
+		return true
+	}
+	return false
+}
+
+func (trip Trip) ValidateDestination(destination string) bool {
+	if destination != "" {
+		return true
+	}
+	return false
+}

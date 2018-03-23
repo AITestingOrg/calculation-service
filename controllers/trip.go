@@ -9,6 +9,7 @@ import (
 	"time"
 	"fmt"
 	"log"
+	"errors"
 )
 
 func GetCost(w http.ResponseWriter, r *http.Request) {
@@ -20,13 +21,15 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	var estimation models.Estimation
 	json.Unmarshal(body, &estimation)
 
-	// trip.ValidateOrigin(trip.origin)
 	log.Printf("Validating trip and estimation body...")
+	if (!trip.ValidateOrigin(trip.Origin)) || (!trip.ValidateDestination(trip.Destination)) {
+		err := errors.New("Strings are empty!")
+		panic(err)
+	}
 
 	//Sets depature time to current time
 	log.Printf("Sending current time to Gmaps adapter...")
 	currentTime := time.Now().Unix()
-	log.Print(currentTime)
 	trip.DepartureTime = currentTime
 
 	//Receives calculated cost and returns as json
