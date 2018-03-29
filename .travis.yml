@@ -2,7 +2,7 @@ language: go
 go:
 - '1.10'
 go_import_path: 
-- src/calculation-service
+- calculation-service
 before_install:
 - echo "Testing Docker Hub credentials"
 - docker -v
