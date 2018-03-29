@@ -2,6 +2,9 @@ language: go
 go:
 - '1.10'
 before_install:
+- export GOROOT=/usr/local/go
+- export GOPATH=$HOME/go
+- export PATH=$PATH:$GOROOT/bin
 - echo "Testing Docker Hub credentials"
 - docker -v
 - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
