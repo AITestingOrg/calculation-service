@@ -1,0 +1,16 @@
+version: '3'  
+services:
+  gmaps-adapter:
+    image: aista/gmaps-adapter
+    ports:
+      - "8080"
+  calculation-service:
+    depends_on:
+      - gmaps-adapter
+    build: .
+    command: ["go", "run", "main.go"]
+    volumes:
+      - .:/go/src/calculation-service
+    ports:
+      - "8000"
+
