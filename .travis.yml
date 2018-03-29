@@ -1,0 +1,22 @@
+language: go
+go:
+ - "1.10"
+
+before_install:
+ - echo "Testing Docker Hub credentials"
+ - docker -v
+ - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+ - echo "Docker Hub credentials are working"
+after_success:
+ - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;
+  else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+ - echo "Test Success - BranchActual($ACTUAL_BRANCH) Pull Request($TRAVIS_PULL_REQUEST)
+  Tag($TRAVIS_TAG) PR($TRAVIS_PULL_REQUEST) Build($TRAVIS_BUILD_NUMBER)"
+ - if [[ "$ACTUAL_BRANCH" == "master" ]]; then echo -e "Push Container to Docker Hub";
+  fi
+ - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
+ - export REPO=aista/calculation-service
+ - export TAG=`if [ "$ACTUAL_BRANCH" == "master" ]; then echo "latest";else echo "";
+  fi`
+ - docker build -f Dockerfile -t $REPO:$TAG .
+ - docker push $REPO
