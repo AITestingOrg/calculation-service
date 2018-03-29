@@ -20,7 +20,9 @@ func GetGmapsEstimation(trip models.Trip) models.Estimation {
 
 	// Request estimation
 	log.Printf("Requesting information from Gmaps adapter...")
-	url := "http://localhost:8080/directions"
+
+	// TODO: Environment variable (running locally or)
+	url := "http://localhost:8080/api/v1/directions"
 
 	request, _ := http.NewRequest("POST", url, bytes.NewBuffer(encodedTrip))
 	request.Header.Set("Content-Type", "application/json")

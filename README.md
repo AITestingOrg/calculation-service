@@ -25,7 +25,8 @@ go (root)
 More information on setting up the proper go environment can be found in the [official documentation](https://golang.org/doc/install).
 
 ### Running 
-To run the service **locally**, make sure to have the gmaps-adapter running and then continue with these steps:
+
+To run the service **locally**, for now, make sure to have the gmaps-adapter running and then continue with these steps:
   - In the root directory, run `go get -u github.com/gorilla/mux`.
   - Afterwards run `go build`.
   - Then lastly run `./calculation-service`.

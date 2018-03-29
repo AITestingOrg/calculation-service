@@ -12,18 +12,16 @@ func PostToEureka() {
 	var localIpAddr string = GetLocalIpAddress()
 	jsonRequest := RequestBody {
 		Instance {
-			HostName: localIpAddr,
+			HostName: "localhost",
 			App: "calculationservice",
 			IpAddr: localIpAddr,
 			VipAddress: "calculationservice",
 			SecureVipAddress: "calculationservice",
 			Status: "UP",
 			Port: 8000,
-			HomePageUrl: "http://" + localIpAddr + ":8000/",
-			StatusPageUrl: "http://" + localIpAddr + ":8000/info",
-			HealthCheckUrl: "http://" + localIpAddr + ":8000/health",
+			StatusPageUrl: "http://" + localIpAddr + ":8000/api/v1/status",
 			DataCenterInfo: DataCenter { Name: "MyOwn" },
-			Metadata: MetaData { InstanceId: "instanceId" },
+			Metadata: MetaData { InstanceId: "" },
 		},
 	}
 
@@ -34,7 +32,6 @@ func PostToEureka() {
 	}
 
 	log.Printf("Registering with Eureka...")
-	// url := "http://" + localIpAddr + ":8761/eureka/apps/calculationservice"
 	url := "http://discovery-service:8761/eureka/apps/calculationservice"
 	json := []byte(jsonParsed)
 

@@ -14,13 +14,13 @@ func main() {
 	
 	r.HandleFunc("/cost", controllers.GetCost).Methods("POST")
 	log.Println("Calculation service is running...")
-
 	var eurekaUp bool = false
 	for eurekaUp != true {
 		eurekaUp = checkEurekaService(eurekaUp)
 	}
 	eureka.PostToEureka()
 	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Println("Listening and serving on :8000")
 }
 
 func checkEurekaService(eurekaUp bool) bool {
