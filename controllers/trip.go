@@ -25,18 +25,18 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	//Sets depature time to current time
 	log.Printf("Sending current time to Gmaps adapter...")
 	currentTime := time.Now().Unix()
-	log.Print(currentTime)
 	trip.DepartureTime = currentTime
 
 	//Receives calculated cost and returns as json
 	calculateCost := services.CalculateCost(trip, estimation)
+	log.Printf(calculateCost.toString())
 	log.Printf("Receiving calculated costs...")
-	encodedEstimationCost, marshallErr := json.Marshal(models.Estimation{ Cost: calculateCost })
+	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: calculateCost })
 	if marshallErr != nil {
 		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 	log.Printf("Distance, duration, and cost estimations returned!")
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(encodedEstimationCost)
+	w.Write(encodedEstimation)
 }
