@@ -11,6 +11,7 @@ Be sure to clone the repository (calculation-service) in the proper folder (in t
 go (root)
  │ - src
  │     │ - project_files (project root)
+       | - other_project (other project root)
  │     └───
  │ - pkg
  │     │ - ...
@@ -21,12 +22,14 @@ go (root)
  └───
 ```
 
-More information on setting up the proper go environment can be found in the official documentation.
+More information on setting up the proper go environment can be found in the [official documentation](https://golang.org/doc/install).
 
 ### Running 
 To run the service **locally**, make sure to have the gmaps-adapter running and then continue with these steps:
-  - In the root of the project, run `go get -u github.com/gorilla/mux`.
+  - In the root directory, run `go get -u github.com/gorilla/mux`.
   - Afterwards run `go build`.
   - Then lastly run `./calculation-service`.
+  
+**Eureka is not used locally.
 
 To run the service in **containers** using Docker (make sure you have Docker installed and running), clone the repository and simply run: `docker-compose up --build` at the root of the project.
