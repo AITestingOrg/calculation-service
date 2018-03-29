@@ -1,6 +1,8 @@
 language: go
 go:
 - '1.10'
+go_import_path: 
+- src/calculation-service
 before_install:
 - export GOROOT=/usr/local/go
 - export GOPATH=$HOME/go
