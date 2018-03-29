@@ -31,7 +31,7 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	calculateCost := services.CalculateCost(trip, estimation)
 	gmapsEstimation := services.GetGmapsEstimation(trip)
 	duration := gmapsEstimation.Duration/60
-	distance := gmapsEstimation.Distance/1609
+	distance := float64(int(gmapsEstimation.Distance/1609 * 100)) / 100
 	log.Printf("Receiving calculated costs...")
 	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: calculateCost, 
 		Duration: duration, Distance: distance})
