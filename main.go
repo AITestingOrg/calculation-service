@@ -11,19 +11,14 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-<<<<<<< HEAD
 	
-	r.HandleFunc("/cost", controllers.GetCost).Methods("POST")
+	r.HandleFunc("/api/v1/cost", controllers.GetCost).Methods("POST")
 	log.Println("Calculation service is running...")
 	var eurekaUp bool = false
 	for eurekaUp != true {
 		eurekaUp = checkEurekaService(eurekaUp)
 	}
 	eureka.PostToEureka()
-=======
-	log.Println("Calculation service is running...")
-	r.HandleFunc("/api/v1/cost", controllers.GetCost).Methods("POST")
->>>>>>> cea3f0ff3c49670dcadd026cff2049e7867da94f
 	log.Fatal(http.ListenAndServe(":8000", r))
 	log.Println("Listening and serving on :8000")
 }
