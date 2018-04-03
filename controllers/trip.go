@@ -25,7 +25,7 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Sending current time to Gmaps adapter...")
 	currentTime := time.Now().Unix()
 	trip.DepartureTime = currentTime
-
+	
 	//Receives calculated cost and returns as json
 	calculateCost := services.CalculateCost(trip, estimation)
 	log.Printf("Distance, duration, and cost estimations returned!")

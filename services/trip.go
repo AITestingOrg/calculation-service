@@ -10,6 +10,7 @@ import (
 	"log"
 	"encoding/xml"
 	"os"
+	"time"
 )
 
 type Instance struct {
@@ -56,8 +57,6 @@ func GetGmapsEstimation(trip models.Trip) models.Estimation {
 
 func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 
-	log.Print("Entered Calculate Cost method")
-
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9
@@ -74,8 +73,10 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 	var finalCost = float64(int((costDuration + costDistance) * 100)) / 100
 
 	//Maps response to JSON body
+	currentDate := time.Now().Format("Jan 02 2006")
 	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: finalCost, 
-		Duration: int64(duration), Distance: distance})
+		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
+		LastUpdated: currentDate})
 	if marshallErr != nil {
 		fmt.Println(marshallErr)
 		panic(marshallErr)
