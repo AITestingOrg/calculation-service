@@ -1,5 +1,9 @@
 version: '3'  
 services:
+  discovery-service:
+    image: springcloud/eureka
+    ports:
+      - 8761:8761
   gmaps-adapter:
     image: aista/gmaps-adapter
     ports:
@@ -9,8 +13,6 @@ services:
       - gmaps-adapter
     build: .
     command: ["go", "run", "main.go"]
-    volumes:
-      - .:/go/src/calculation-service
     ports:
       - "8000"
 

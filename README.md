@@ -23,6 +23,7 @@ To run locally:
    - When running locally, Eureka will not be initialized.
 
 To run using docker-compose: (be sure to have Docker installed)
+   - Be sure to run `docker-compose pull` to make sure you have the latest images pulled.
    - Run `docker-compose up --build` within the calculation-service folder.
    - Both services gmaps and calculation should be initiated and also registered by [Eureka](https://github.com/Netflix/eureka).
 
