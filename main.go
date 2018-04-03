@@ -20,7 +20,7 @@ func main() {
 	}
 	eureka.PostToEureka()
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func checkEurekaService(eurekaUp bool) bool {
