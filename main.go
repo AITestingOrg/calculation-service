@@ -1,7 +1,7 @@
 package main
 	
 import (
-	"calculation-service/controllers"
+	"github.com/AITestingOrg/calculation-service/controllers"
 	"net/http"
 	"log"
 	"github.com/gorilla/mux"
