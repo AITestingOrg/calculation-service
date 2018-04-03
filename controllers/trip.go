@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"errors"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
