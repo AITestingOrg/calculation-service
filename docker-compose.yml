@@ -17,8 +17,6 @@ services:
       - discovery-service
     build: .
     command: ["go", "run", "main.go"]
-    volumes:
-      - .:/go/src/calculation-service
     ports:
       - "8000"
     environment:
