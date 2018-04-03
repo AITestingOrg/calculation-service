@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/models"
 	"net/http"
 	"log"
 )
