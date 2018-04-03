@@ -2,12 +2,11 @@ package main
 	
 import (
 	"github.com/AITestingOrg/calculation-service/controllers"
+	"github.com/AITestingOrg/calculation-service/eureka"
 	"log"
 	"time"
 	"net/http"
 	"github.com/gorilla/mux"
-	"calculation-service/eureka"
-	"calculation-service/controllers"
 )
 
 func main() {
