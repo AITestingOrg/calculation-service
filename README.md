@@ -6,30 +6,21 @@ The service currently depends on the [gmaps-adapter](https://github.com/AITestin
 ## Set Up
 
 ### Go Environment
-Be sure to clone the repository (calculation-service) in the proper folder (in this case under the src folder). Your structure should look somewhat like so:
-```go
-go (root)
- │ - src
- │     │ - project_files (project root)
-       | - other_project (other project root)
- │     └───
- │ - pkg
- │     │ - ...
- │     └───
- │ - bin
- │     │ - ...
- │     └───
- └───
-```
 
-More information on setting up the proper go environment can be found in the [official documentation](https://golang.org/doc/install).
+Please read carefully through the [Go documentation](https://golang.org/doc/install) on how to set up the main environment. After downloading the package, a site should pop up giving you further installation/setup instructions.
 
-### Running 
-To run the service **locally**, make sure to have the gmaps-adapter running and then continue with these steps:
-  - In the root directory, run `go get -u github.com/gorilla/mux`.
-  - Afterwards run `go build`.
-  - Then lastly run `./calculation-service`.
-  
-**Eureka is not used locally.
+To get the calculation service project (make sure you've set up the Go environment) simply cd into your GOPATH and run this command: `go get github.com/AITestingOrg/calculation-service`.
+   - After completing these steps, go should automatically install the necessary dependencies needed to begin developing.
 
-To run the service in **containers** using Docker (make sure you have Docker installed and running), clone the repository and simply run: `docker-compose up --build` at the root of the project.
+### Running
+
+To run locally:
+   - Have the [gmaps adapter](https://github.com/AITestingOrg/gmaps-adapter) repository cloned. Follow the instructions within the README to initiate it using the terminal. Make sure that it's listening and serving on port 8080.
+   - Build any changes you may have made (or if you haven't built at all) with the command `go build` within the terminal under the calculation-service folder.
+   - Begin the calculation service with the command `./calculation-service`, it should log that the service is running.
+
+To run using docker-compose: (be sure to have Docker installed)
+   - Run `docker-compose up --build` within the calculation-service folder.
+   - Both services gmaps and calculation should be initiated and also registered by [Eureka](https://github.com/Netflix/eureka).
+
+## Endpoints
