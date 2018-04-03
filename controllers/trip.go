@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"time"
 	"net/http"
@@ -29,17 +28,8 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 
 	//Receives calculated cost and returns as json
 	calculateCost := services.CalculateCost(trip, estimation)
-	gmapsEstimation := services.GetGmapsEstimation(trip)
-	duration := gmapsEstimation.Duration/60
-	distance := float64(int(gmapsEstimation.Distance/1609 * 100)) / 100
-	log.Printf("Receiving calculated costs...")
-	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: calculateCost, 
-		Duration: duration, Distance: distance})
-	if marshallErr != nil {
-		fmt.Println(marshallErr)
-		panic(marshallErr)
-	}
 	log.Printf("Distance, duration, and cost estimations returned!")
+	
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(encodedEstimation)
+	w.Write(calculateCost)
 }

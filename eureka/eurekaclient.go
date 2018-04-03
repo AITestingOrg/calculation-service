@@ -12,7 +12,7 @@ func PostToEureka() {
 	var localIpAddr string = GetLocalIpAddress()
 	jsonRequest := RequestBody {
 		Instance {
-			HostName: "localhost",
+			HostName: localIpAddr,
 			App: "calculationservice",
 			IpAddr: localIpAddr,
 			VipAddress: "calculationservice",

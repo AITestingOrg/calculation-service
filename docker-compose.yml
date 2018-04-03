@@ -21,3 +21,5 @@ services:
       - .:/go/src/calculation-service
     ports:
       - "8000"
+    environment:
+      - EUREKA_SERVER=discovery-service
