@@ -1,15 +1,14 @@
 package controllers
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"calculation-service/services"
-	"calculation-service/models"
-	"net/http"
-	"time"
 	"fmt"
 	"log"
-	"errors"
+	"time"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
+	"calculation-service/models"
+	"calculation-service/services"
 )
 
 func GetCost(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +19,7 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &trip)
 	var estimation models.Estimation
 	json.Unmarshal(body, &estimation)
-
+	
 	log.Printf("Validating trip and estimation body...")
 	if (!trip.ValidateOrigin(trip.Origin)) || (!trip.ValidateDestination(trip.Destination)) {
 		err := errors.New("Strings are empty!")
@@ -34,13 +33,17 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 
 	//Receives calculated cost and returns as json
 	calculateCost := services.CalculateCost(trip, estimation)
+	gmapsEstimation := services.GetGmapsEstimation(trip)
+	duration := gmapsEstimation.Duration/60
+	distance := float64(int(gmapsEstimation.Distance/1609 * 100)) / 100
 	log.Printf("Receiving calculated costs...")
-	encodedEstimationCost, marshallErr := json.Marshal(models.Cost{Cost: calculateCost})
+	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: calculateCost, 
+		Duration: duration, Distance: distance})
 	if marshallErr != nil {
 		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
-	log.Printf("Calculated costs returned!")
+	log.Printf("Distance, duration, and cost estimations returned!")
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(encodedEstimationCost)
+	w.Write(encodedEstimation)
 }
