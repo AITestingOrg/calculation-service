@@ -12,3 +12,12 @@ services:
       - "8080"
     environment:
       - EUREKA_SERVER=discovery-service
+  calculation-service:
+    depends_on:
+      - discovery-service
+    build: .
+    command: ["go", "run", "main.go"]
+    ports:
+      - "8080"
+    environment:
+      - EUREKA_SERVER=discovery-service
