@@ -7,6 +7,7 @@ before_install:
 - docker -v
 - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
 - echo "Docker Hub credentials are working"
+- chmod +x .travis.gofmt.sh
 script:
 - ./.travis.gofmt.sh
 after_success:
