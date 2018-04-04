@@ -88,6 +88,9 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 func getIpAddress() string {
 
 	eureka := os.Getenv("EUREKA_SERVER")
+	if eureka == "" {
+		eureka = "discovery-service"
+	}
 	url := fmt.Sprintf("http://%s:8761/eureka/apps/gmapsadapter", eureka)
 	request, _ := http.NewRequest("GET", url, nil)
 
