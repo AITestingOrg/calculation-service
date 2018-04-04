@@ -1,13 +1,24 @@
 language: go
+
 go:
 - '1.10'
 
+services:
+- docker
+
+gobuild_args: -tags all
+
 before_install:
-- docker-compose -f docker-compose-test.yml up --build -d
+- docker-compose pull
+- docker-compose up --build -d 
 - echo "Testing Docker Hub credentials"
 - docker -v
 - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
 - echo "Docker Hub credentials are working"
+
+script:
+- calculation_id=$(docker ps -aqf "name=calculationservice_calculation-service_1")
+- docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -tags integration"
 
 after_success:
 - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;

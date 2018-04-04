@@ -22,6 +22,7 @@ type Instance struct {
 func GetGmapsEstimation(trip models.Trip) models.Estimation {
 
 	ipAddress := getIpAddress()
+	log.Printf("IP Address found: " + ipAddress)
 
 	// Encode trip
 	encodedTrip, marshallErr := json.Marshal(trip)

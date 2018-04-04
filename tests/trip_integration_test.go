@@ -1,19 +1,26 @@
+// +build integration
+
 package tests
 
 import (
-	"net/http"
-    "net/http/httptest"
-	"testing"
-	"github.com/AITestingOrg/calculation-service/controllers"
-	"github.com/AITestingOrg/calculation-service/models"
-	"bytes"
-	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"log"
-	"time"
+	"bytes"
+	"testing"
+	"net/http"
+	"encoding/json"
+	"net/http/httptest"
+	"github.com/stretchr/testify/assert"
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/eureka"
+	"github.com/AITestingOrg/calculation-service/controllers"
 )
 
+//Wait for Eureka to stand up before requesting any information during an integration test
 func TestResponseStatusAndCost(t *testing.T) {
+	log.Printf("Waiting for Eureka")
+	var eurekaUp bool = false
+	eurekaUp = eureka.CheckEurekaService(eurekaUp)
+	log.Printf("Eureka found, creating request")
 	trip := &models.Trip {
 		Origin:"Miami",
 		Destination:"Weston",
@@ -27,15 +34,13 @@ func TestResponseStatusAndCost(t *testing.T) {
 		t.Errorf("Expected 'POST; request, got '%s'", request.Method)
 	}
 	if request.URL.EscapedPath() != "/api/v1/cost" {
-		t.Errorf("Expected request to ‘/cost’, got ‘%s’", request.URL.EscapedPath())
+		t.Errorf("Expected request to ‘/api/v1/cost’, got ‘%s’", request.URL.EscapedPath())
 	}
 	
 	log.Print("Handling Request...")
 	rr := httptest.NewRecorder()
 	log.Printf("Recording")
 
-	duration := time.Duration(35)*time.Second
-	time.Sleep(duration)
 	handler := http.HandlerFunc(controllers.GetCost)
 	handler.ServeHTTP(rr, request)
 
