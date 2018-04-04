@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"time"
 )
 
 func TestResponseStatusAndCost(t *testing.T) {
@@ -32,6 +33,9 @@ func TestResponseStatusAndCost(t *testing.T) {
 	log.Print("Handling Request...")
 	rr := httptest.NewRecorder()
 	log.Printf("Recording")
+
+	duration := time.Duration(35)*time.Second
+	time.Sleep(duration)
 	handler := http.HandlerFunc(controllers.GetCost)
 	handler.ServeHTTP(rr, request)
 
