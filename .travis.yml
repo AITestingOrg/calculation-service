@@ -7,10 +7,11 @@ before_install:
 - docker -v
 - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
 - echo "Docker Hub credentials are working"
-before_script:
-  - GO_FILES=$(find . -iname '*.go' -type f) 
-script:
-  - test -z $(gofmt -s -l $GO_FILES)
+- if [ -n "$(gofmt -l .)" ]; then
+    echo "Go code is not formatted:"
+    gofmt -d .
+    exit 1
+  fi
 after_success:
 - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;
   else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
