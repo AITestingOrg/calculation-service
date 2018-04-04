@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"log"
 )
 
 func TestResponseStatusAndCost(t *testing.T) {
@@ -17,16 +18,20 @@ func TestResponseStatusAndCost(t *testing.T) {
 		Destination:"Weston",
 	}
 	jsonTrip, _ := json.Marshal(trip)
-	request, _ := http.NewRequest("POST", "/cost", bytes.NewBuffer(jsonTrip))
+	request, _ := http.NewRequest("POST", "/api/v1/cost", bytes.NewBuffer(jsonTrip))
+	request.Header.Set("Content-Type", "application/json")
+	log.Printf("Finished creating request")
 
 	if request.Method != "POST" {
 		t.Errorf("Expected 'POST; request, got '%s'", request.Method)
 	}
-	if request.URL.EscapedPath() != "/cost" {
+	if request.URL.EscapedPath() != "/api/v1/cost" {
 		t.Errorf("Expected request to ‘/cost’, got ‘%s’", request.URL.EscapedPath())
 	}
 	
+	log.Print("Handling Request...")
 	rr := httptest.NewRecorder()
+	log.Printf("Recording")
 	handler := http.HandlerFunc(controllers.GetCost)
 	handler.ServeHTTP(rr, request)
 
