@@ -3,20 +3,20 @@ package services
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"github.com/AITestingOrg/calculation-service/models"
-	"net/http"
-	"log"
 	"encoding/xml"
+	"fmt"
+	"github.com/AITestingOrg/calculation-service/models"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"time"
 )
 
 type Instance struct {
-    IpAddress struct {
-        InnerXML string `xml:",innerxml"`
-    } `xml:"instance>ipAddr"`
+	IpAddress struct {
+		InnerXML string `xml:",innerxml"`
+	} `xml:"instance>ipAddr"`
 }
 
 func GetGmapsEstimation(trip models.Trip) models.Estimation {
@@ -63,18 +63,18 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 
 	//Get duration and distance from gmaps request
 	gmapsEstimation := GetGmapsEstimation(trip)
-	var duration = float64(gmapsEstimation.Duration/60)
-	var distance = float64(int(gmapsEstimation.Distance/1609 * 100)) / 100
+	var duration = float64(gmapsEstimation.Duration / 60)
+	var distance = float64(int(gmapsEstimation.Distance/1609*100)) / 100
 
 	//Calculates cost
 	log.Printf("Calculating costs...")
-	var costDuration = (duration)*costPerMinute
-	var costDistance = (distance)*costPerMile
-	var finalCost = float64(int((costDuration + costDistance) * 100)) / 100
+	var costDuration = (duration) * costPerMinute
+	var costDistance = (distance) * costPerMile
+	var finalCost = float64(int((costDuration+costDistance)*100)) / 100
 
 	//Maps response to JSON body
 	currentDate := time.Now().Format("Jan 02 2006")
-	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: finalCost, 
+	encodedEstimation, marshallErr := json.Marshal(models.Estimation{Cost: finalCost,
 		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
 		LastUpdated: currentDate})
 	if marshallErr != nil {

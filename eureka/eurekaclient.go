@@ -1,27 +1,27 @@
 package eureka
 
 import (
-	"net/http"
 	"bytes"
+	"encoding/json"
 	"log"
 	"net"
-	"encoding/json"
+	"net/http"
 )
 
 func PostToEureka() {
 	var localIpAddr string = GetLocalIpAddress()
-	jsonRequest := RequestBody {
-		Instance {
-			HostName: localIpAddr,
-			App: "calculationservice",
-			IpAddr: localIpAddr,
-			VipAddress: "calculationservice",
+	jsonRequest := RequestBody{
+		Instance{
+			HostName:         localIpAddr,
+			App:              "calculationservice",
+			IpAddr:           localIpAddr,
+			VipAddress:       "calculationservice",
 			SecureVipAddress: "calculationservice",
-			Status: "UP",
-			Port: 8000,
-			StatusPageUrl: "http://" + localIpAddr + ":8000/api/v1/status",
-			DataCenterInfo: DataCenter { Name: "MyOwn" },
-			Metadata: MetaData { InstanceId: "" },
+			Status:           "UP",
+			Port:             8000,
+			StatusPageUrl:    "http://" + localIpAddr + ":8000/api/v1/status",
+			DataCenterInfo:   DataCenter{Name: "MyOwn"},
+			Metadata:         MetaData{InstanceId: ""},
 		},
 	}
 
@@ -52,15 +52,15 @@ func PostToEureka() {
 
 func GetLocalIpAddress() string {
 	addrs, err := net.InterfaceAddrs()
-    if err != nil {
-        panic(err)
-    }
-    for _, address := range addrs {
-        if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-            if ipnet.IP.To4() != nil {
-                return ipnet.IP.String()
+	if err != nil {
+		panic(err)
+	}
+	for _, address := range addrs {
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
 			}
-        }
-    }
-    return "localhost"
+		}
+	}
+	return "localhost"
 }
