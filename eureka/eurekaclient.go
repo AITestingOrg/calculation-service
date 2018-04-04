@@ -6,6 +6,9 @@ import (
 	"log"
 	"net"
 	"encoding/json"
+	"time"
+	"strings"
+	"fmt"
 )
 
 func PostToEureka() {
@@ -63,4 +66,28 @@ func GetLocalIpAddress() string {
         }
     }
     return "localhost"
+}
+
+func StartHeartbeat() {
+	for {
+		time.Sleep(time.Second * 30)
+		heartbeat()
+	}
+}
+
+func heartbeat() {
+	var ipAddress = GetLocalIpAddress()
+	url := fmt.Sprintf("http://discovery-service:8761/eureka/apps/calculationservice/%s", ipAddress)
+
+	request, _ := http.NewRequest("PUT", url, strings.NewReader(ipAddress))
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Print(response)
+	log.Print("eureka heartbeat sent!")
+	
 }
