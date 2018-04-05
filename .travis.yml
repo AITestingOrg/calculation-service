@@ -16,7 +16,7 @@ before_install:
 - echo "Docker Hub credentials are working"
 
 script:
-- docker exec -it calculation-service bash -c “cd tests && go test -tags integration”
+- docker exec -it calculationservice_calculation-service_1 bash -c “cd tests && go test -tags integration”
 
 after_success:
 - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;
