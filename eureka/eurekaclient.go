@@ -67,8 +67,8 @@ func CheckEurekaService(eurekaUp bool) bool {
   	client := &http.Client{}
   	response, responseErr := client.Do(request)
   	if responseErr != nil {
-	  	log.Printf("Response error")
-	  	panic(responseErr)
+	  	log.Printf("Not responding")
+	  	return false
   	}
   	if response.Status != "204 No Content" {
 	  	log.Printf("Success, Eureka was found")
