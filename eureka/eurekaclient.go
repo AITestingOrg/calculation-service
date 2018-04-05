@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"encoding/json"
+	"time"
 )
 
 func PostToEureka() {
@@ -48,6 +49,27 @@ func PostToEureka() {
 		panic("ERROR: 204 Response Not Returned")
 	}
 	log.Printf("Registered with Eureka!")
+}
+
+func CheckEurekaService(eurekaUp bool) bool {
+	duration := time.Duration(15)*time.Second
+	time.Sleep(duration)
+ 	url := "http://discovery-service:8761/eureka/"
+
+  	request, _ := http.NewRequest("GET", url, nil)
+  	request.Header.Set("Content-Type", "application/json")
+
+  	client := &http.Client{}
+  	response, responseErr := client.Do(request)
+  	if responseErr != nil {
+	  	log.Printf("Response error")
+	  	panic(responseErr)
+  	}
+  	if response.Status != "204 No Content" {
+	  	log.Printf("Success, Eureka was found")
+	  	return true
+  	}
+  	return false
 }
 
 func GetLocalIpAddress() string {
