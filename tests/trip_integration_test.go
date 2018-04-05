@@ -1,16 +1,18 @@
+// +build integration
+
 package tests
 
 import (
-	"net/http"
-    "net/http/httptest"
+	"log"
+	"bytes"
 	"testing"
-	"github.com/AITestingOrg/calculation-service/controllers"
+	"net/http"
+	"encoding/json"
+	"net/http/httptest"
+	"github.com/stretchr/testify/assert"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/AITestingOrg/calculation-service/eureka"
-	"bytes"
-	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"log"
+	"github.com/AITestingOrg/calculation-service/controllers"
 )
 
 //Wait for Eureka to stand up before requesting any information during an integration test

@@ -1,13 +1,22 @@
 language: go
+
 go:
 - '1.10'
 
+services:
+- docker
+
+gobuild_args: -tags all
+
 before_install:
-- docker-compose -f docker-compose-test.yml up --build -d
+- docker-compose up --build -d 
 - echo "Testing Docker Hub credentials"
 - docker -v
 - docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD
 - echo "Docker Hub credentials are working"
+
+script:
+- docker exec -it calculation-service bash -c “cd tests && go test -tags integration”
 
 after_success:
 - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;

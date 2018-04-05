@@ -5,8 +5,10 @@ import (
 	"bytes"
 	"log"
 	"net"
+	"os"
 	"encoding/json"
 	"time"
+	"fmt"
 )
 
 func PostToEureka() {
@@ -33,7 +35,8 @@ func PostToEureka() {
 	}
 
 	log.Printf("Registering with Eureka...")
-	url := "http://discovery-service:8761/eureka/apps/calculationservice"
+	eureka := os.Getenv("EUREKA_SERVER")
+	url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice", eureka)
 	json := []byte(jsonParsed)
 
 	request, _ := http.NewRequest("POST", url, bytes.NewBuffer(json))
@@ -54,7 +57,9 @@ func PostToEureka() {
 func CheckEurekaService(eurekaUp bool) bool {
 	duration := time.Duration(15)*time.Second
 	time.Sleep(duration)
- 	url := "http://discovery-service:8761/eureka/"
+
+	eureka := os.Getenv("EUREKA_SERVER")
+	url := fmt.Sprintf("http://%s:8761/eureka/", eureka)
 
   	request, _ := http.NewRequest("GET", url, nil)
   	request.Header.Set("Content-Type", "application/json")
