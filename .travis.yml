@@ -9,6 +9,7 @@ services:
 gobuild_args: -tags all
 
 before_install:
+- docker-compose pull
 - docker-compose up --build -d 
 - echo "Testing Docker Hub credentials"
 - docker -v
