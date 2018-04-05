@@ -87,12 +87,15 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 }
 
 func getIpAddress() string {
-
 	eureka := os.Getenv("EUREKA_SERVER")
 	if eureka == "" {
 		eureka = "discovery-service"
 	}
 	url := fmt.Sprintf("http://%s:8761/eureka/apps/gmapsadapter", eureka)
+
+	var maxAttempts int = 5
+	retryGET(maxAttempts, url)
+
 	request, _ := http.NewRequest("GET", url, nil)
 
 	client := &http.Client{}
@@ -113,4 +116,22 @@ func getIpAddress() string {
 	log.Printf("Received Ip Address!")
 
 	return instance.IpAddress.InnerXML
+}
+
+//Retry GET requests to specified url according to maxAttempts
+func retryGET(maxAttempts int, url string) {
+	log.Printf("Attempting to connect to " + url)
+	var response *http.Response
+	for i := 0; i < maxAttempts; i++ {
+		request, _ := http.NewRequest("GET", url, nil)
+		client := &http.Client{}
+		response, _ = client.Do(request)
+		if response.Status == "200 OK" {
+			log.Printf("Success response returned, continuing")
+			break
+		}
+	}
+	if response.Status != "200 OK" {
+		log.Printf("Response was never successful, please increase attempts")
+	}
 }
