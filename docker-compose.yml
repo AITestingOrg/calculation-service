@@ -15,7 +15,7 @@ services:
   calculation-service:
     depends_on:
       - discovery-service
-    build: .
+    build: ./
     command: ["go", "run", "main.go"]
     ports:
       - "8080"
