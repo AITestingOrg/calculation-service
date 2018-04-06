@@ -1,12 +1,12 @@
 language: go
 
 go:
-- '1.2'
+- '1.10'
 
 services:
 - docker
 
-gobuild_args: -tags unit -cover
+gobuild_args: -tags unit
 
 before_install:
 - docker-compose pull
