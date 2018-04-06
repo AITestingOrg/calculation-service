@@ -6,7 +6,7 @@ go:
 services:
 - docker
 
-gobuild_args: ./... -cover -tags unit
+gobuild_args: -cover -tags unit
 
 before_install:
 - docker-compose pull
