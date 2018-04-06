@@ -1,11 +1,12 @@
 package main
-	
+
 import (
 	"github.com/AITestingOrg/calculation-service/controllers"
 	"github.com/AITestingOrg/calculation-service/eureka"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"github.com/gorilla/mux"
+	"time"
 )
 
 func main() {
@@ -23,8 +24,8 @@ func main() {
 }
 
 func checkEurekaService(eurekaUp bool) bool {
-  	duration := time.Duration(15)*time.Second
-	  time.Sleep(duration)
+	duration := time.Duration(15) * time.Second
+	time.Sleep(duration)
 	url := "http://discovery-service:8761/eureka/"
 	log.Println("Sending request to Eureka, waiting for response...")
 	request, _ := http.NewRequest("GET", url, nil)
@@ -34,7 +35,7 @@ func checkEurekaService(eurekaUp bool) bool {
 	response, responseErr := client.Do(request)
 	if responseErr != nil {
 		log.Printf("No response from Eureka, retrying...")
-		return false;
+		return false
 	}
 	if response.Status != "204 No Content" {
 		log.Printf("Success, Eureka was found!")
