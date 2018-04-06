@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"calculation-service/services"
-	"calculation-service/models"
-	"net/http"
-	"time"
-	"fmt"
 	"log"
+	"time"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/services"
 )
 
 func GetCost(w http.ResponseWriter, r *http.Request) {
@@ -19,25 +18,18 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &trip)
 	var estimation models.Estimation
 	json.Unmarshal(body, &estimation)
-
-	// trip.ValidateOrigin(trip.origin)
+	
 	log.Printf("Validating trip and estimation body...")
 
 	//Sets depature time to current time
 	log.Printf("Sending current time to Gmaps adapter...")
 	currentTime := time.Now().Unix()
-	log.Print(currentTime)
 	trip.DepartureTime = currentTime
-
+	
 	//Receives calculated cost and returns as json
 	calculateCost := services.CalculateCost(trip, estimation)
-	log.Printf("Receiving calculated costs...")
-	encodedEstimationCost, marshallErr := json.Marshal(models.Cost{Cost: calculateCost})
-	if marshallErr != nil {
-		fmt.Println(marshallErr)
-		panic(marshallErr)
-	}
-	log.Printf("Calculated costs returned!")
+	log.Printf("Distance, duration, and cost estimations returned!")
+	
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(encodedEstimationCost)
+	w.Write(calculateCost)
 }
