@@ -15,7 +15,7 @@ before_install:
 - echo "Docker Hub credentials are working"
 
 script:
-- github.com/jarcoal/httpmock && go test -tags unit -cover ./...
+- go get github.com/jarcoal/httpmock && go test -tags unit -cover ./...
 - calculation_id=$(docker ps -aqf "name=calculationservice_calculation-service_1")
 - docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -tags integration"
 
