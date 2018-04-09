@@ -23,7 +23,6 @@ func GetGmapsEstimation(trip models.Trip) models.Estimation {
 	// Encode trip
 	encodedTrip, marshallErr := json.Marshal(trip)
 	if marshallErr != nil {
-		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 
@@ -75,7 +74,6 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
 		LastUpdated: currentDate})
 	if marshallErr != nil {
-		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 

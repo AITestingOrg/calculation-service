@@ -9,6 +9,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGetGmapsEstimation(t *testing.T) {
@@ -74,6 +75,8 @@ func TestCalculateCost(t *testing.T) {
 		Duration: 2552,
 	}
 
+	currentDate := time.Now().Format("Jan 02 2006")
+
 	encodedEstimation, err := json.Marshal(estimation)
 	if err != nil {
 		panic(err)
@@ -104,6 +107,7 @@ func TestCalculateCost(t *testing.T) {
 	assert.Equal(t, 28.7, resultBody.Distance)
 	assert.Equal(t, int64(42), resultBody.Duration)
 	assert.Equal(t, 32.12, resultBody.Cost)
+	assert.Equal(t, currentDate, resultBody.LastUpdated)
 }
 
 func TestCalculateCostWhenConnectionRefused(t *testing.T) {
