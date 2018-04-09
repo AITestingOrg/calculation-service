@@ -32,7 +32,6 @@ func GetIpAddress() string {
 	if responseErr != nil {
 		panic(responseErr)
 	}
-	log.Println(response)
 	log.Printf("Reading XML body...")
 	body, _ := ioutil.ReadAll(response.Body)
 

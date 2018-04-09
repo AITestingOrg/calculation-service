@@ -6,8 +6,6 @@ go:
 services:
 - docker
 
-gobuild_args: -tags unit
-
 before_install:
 - docker-compose pull
 - docker-compose up --build -d 
@@ -17,6 +15,7 @@ before_install:
 - echo "Docker Hub credentials are working"
 
 script:
+- go test -tags unit -cover ./...
 - calculation_id=$(docker ps -aqf "name=calculationservice_calculation-service_1")
 - docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -tags integration"
 
