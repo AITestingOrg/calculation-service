@@ -7,25 +7,35 @@ import (
 	"time"
 	"net/http"
 	"github.com/gorilla/mux"
+	"os"
 )
 
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/cost", controllers.GetCost).Methods("POST")
 	log.Println("Calculation service is running...")
-	var eurekaUp bool = false
-	log.Println("Waiting for Eureka...")
-	for eurekaUp != true {
-		eurekaUp = checkEurekaService(eurekaUp)
+
+	//Check to see if running locally or not
+	var localRun bool = false
+	if os.Getenv("EUREKA_SERVER") == "" {
+		localRun = true
 	}
-	eureka.PostToEureka()
+	if !localRun {
+		var eurekaUp bool = false
+		log.Println("Waiting for Eureka...")
+		for eurekaUp != true {
+			eurekaUp = checkEurekaService(eurekaUp)
+		}
+		eureka.PostToEureka()
+	}
+	
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
 func checkEurekaService(eurekaUp bool) bool {
   	duration := time.Duration(15)*time.Second
-	  time.Sleep(duration)
+	time.Sleep(duration)
 	url := "http://discovery-service:8761/eureka/"
 	log.Println("Sending request to Eureka, waiting for response...")
 	request, _ := http.NewRequest("GET", url, nil)

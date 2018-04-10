@@ -89,6 +89,11 @@ func getIpAddress() string {
 
 	eureka := os.Getenv("EUREKA_SERVER")
 	url := fmt.Sprintf("http://%s:8761/eureka/apps/gmapsadapter", eureka)
+
+	//Check to for local run
+	if eureka == "" {
+		return "localhost"
+	}
 	request, _ := http.NewRequest("GET", url, nil)
 
 	client := &http.Client{}
