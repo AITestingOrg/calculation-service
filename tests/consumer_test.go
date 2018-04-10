@@ -3,8 +3,8 @@ package tests
 import (
 	"fmt"
 	"log"
-	"bytes"
 	"time"
+	"bytes"
 	"testing"
 	"net/http"
 	"encoding/json"
@@ -12,38 +12,34 @@ import (
 	"github.com/AITestingOrg/calculation-service/models"
 )
 
-//Calculation consumes from the GMaps adapter
+//Calculation consumes from the Gmaps adapter
 func TestConsumer(t *testing.T) {
 	// Create Pact connecting to local Daemon
 	pact := &dsl.Pact{
 		Port:     6666, // Ensure this port matches the daemon port!
 		Consumer: "Calculation Service",
-		Provider: "GMaps Adapter",
+		Provider: "Gmaps Adapter",
 		Host:     "localhost",
 	}
+
 	defer pact.Teardown()
 
+	//Trip Model
 	trip := models.Trip {
 		Origin: "9700 Collins Ave, Bal Harbour, FL 33154",
 		Destination: "2250 N Commerce Pkwy, Weston, FL 33326",
-	}
-
+	}	
 	currentTime := time.Now().Unix()
 	trip.DepartureTime = currentTime
 
 	// Pass in test case
 	var test = func() error {
 		url := fmt.Sprintf("http://localhost:%d/api/v1/directions", pact.Server.Port)
-		log.Printf(url)
-
 		encodedTrip, marshallErr := json.Marshal(trip)
 		if marshallErr != nil {
 			log.Printf("Error encoding trip")
 			panic(marshallErr)
 		}
-
-
-
 		request, err := http.NewRequest("POST", url, bytes.NewBuffer(encodedTrip))
 		if err != nil {
 			log.Printf("Error creating new POST request")
@@ -51,21 +47,13 @@ func TestConsumer(t *testing.T) {
 		}
 		request.Header.Set("Content-Type", "application/json")
 
-		// response, err := http.DefaultClient.Do(request)
-		// body, _ := ioutil.ReadAll(response.Body)
-		// decodedEstimation := {
-		// 	Duration
-		// }
-		// unmarshallError := json.Unmarshal(body, &decodedEstimation)
 		if _, err = http.DefaultClient.Do(request); err != nil {
 			log.Printf("Error executing POST request to gmaps-adapter")
 			panic(err)
 		}
 		return err
 	}
-	log.Printf(`{ "distance": ` + dsl.Like("2000") + `,
-		"duration": ` + dsl.Like("2000") + `
-		}`)
+
 	// Set up our expected interactions.
 	pact.
 		AddInteraction().
