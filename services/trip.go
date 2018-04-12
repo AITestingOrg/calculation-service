@@ -69,8 +69,8 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 	var finalCost = float64(int((costDuration+costDistance)*100)) / 100
 
 	//Maps response to JSON body
-	currentDate := time.Now().Format("Jan 02 2006")
-	encodedEstimation, marshallErr := json.Marshal(models.Estimation{Cost: finalCost,
+	currentDate := time.Now().Format("2006-01-02 03:04:05")
+	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: finalCost, 
 		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
 		LastUpdated: currentDate})
 	if marshallErr != nil {
