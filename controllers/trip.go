@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"time"
+	"errors"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
@@ -20,6 +21,10 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &estimation)
 	
 	log.Printf("Validating trip and estimation body...")
+	if (!trip.ValidateOrigin(trip.Origin)) || (!trip.ValidateDestination(trip.Destination)) {
+		err := errors.New("Strings are empty!")
+		panic(err)
+	}
 
 	//Sets depature time to current time
 	log.Printf("Sending current time to Gmaps adapter...")
