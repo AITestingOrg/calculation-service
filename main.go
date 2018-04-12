@@ -16,7 +16,7 @@ func main() {
 	var eurekaUp bool = false
 	log.Println("Waiting for Eureka...")
 	for eurekaUp != true {
-		eurekaUp = checkEurekaService(eurekaUp)
+		eurekaUp = eureka.CheckEurekaService(eurekaUp)
 	}
 	eureka.PostToEureka()
 	http.Handle("/", r)

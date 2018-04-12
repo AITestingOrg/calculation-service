@@ -3,30 +3,26 @@ package services
 import (
 	"bytes"
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/utils"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
-type Instance struct {
-	IpAddress struct {
-		InnerXML string `xml:",innerxml"`
-	} `xml:"instance>ipAddr"`
-}
-
 func GetGmapsEstimation(trip models.Trip) models.Estimation {
 
-	ipAddress := getIpAddress()
+	ipAddress := utils.GetIpAddress()
+	if ipAddress == "" {
+		ipAddress = "localhost"
+	}
+	log.Printf("IP Address found: " + ipAddress)
 
 	// Encode trip
 	encodedTrip, marshallErr := json.Marshal(trip)
 	if marshallErr != nil {
-		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 
@@ -73,40 +69,13 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 	var finalCost = float64(int((costDuration+costDistance)*100)) / 100
 
 	//Maps response to JSON body
-	currentDate := time.Now().Format("Jan 02 2006")
+	currentDate := time.Now().Format("2006-01-02 03:04:05")
 	encodedEstimation, marshallErr := json.Marshal(models.Estimation{Cost: finalCost,
 		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
 		LastUpdated: currentDate})
 	if marshallErr != nil {
-		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 
 	return encodedEstimation
-}
-
-func getIpAddress() string {
-
-	eureka := os.Getenv("EUREKA_SERVER")
-	url := fmt.Sprintf("http://%s:8761/eureka/apps/gmapsadapter", eureka)
-	request, _ := http.NewRequest("GET", url, nil)
-
-	client := &http.Client{}
-	response, responseErr := client.Do(request)
-	if responseErr != nil {
-		panic(responseErr)
-	}
-
-	log.Printf("Reading XML body...")
-	body, _ := ioutil.ReadAll(response.Body)
-
-	var instance Instance
-	unmarshallError := xml.Unmarshal(body, &instance)
-	if unmarshallError != nil {
-		panic(unmarshallError)
-	}
-
-	log.Printf("Received Ip Address!")
-
-	return instance.IpAddress.InnerXML
 }

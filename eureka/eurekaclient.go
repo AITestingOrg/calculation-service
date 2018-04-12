@@ -3,9 +3,12 @@ package eureka
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"time"
 )
 
 func PostToEureka() {
@@ -32,7 +35,8 @@ func PostToEureka() {
 	}
 
 	log.Printf("Registering with Eureka...")
-	url := "http://discovery-service:8761/eureka/apps/calculationservice"
+	eureka := os.Getenv("EUREKA_SERVER")
+	url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice", eureka)
 	json := []byte(jsonParsed)
 
 	request, _ := http.NewRequest("POST", url, bytes.NewBuffer(json))
@@ -48,6 +52,29 @@ func PostToEureka() {
 		panic("ERROR: 204 Response Not Returned")
 	}
 	log.Printf("Registered with Eureka!")
+}
+
+func CheckEurekaService(eurekaUp bool) bool {
+	duration := time.Duration(15) * time.Second
+	time.Sleep(duration)
+
+	eureka := os.Getenv("EUREKA_SERVER")
+	url := fmt.Sprintf("http://%s:8761/eureka/", eureka)
+
+	request, _ := http.NewRequest("GET", url, nil)
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	response, responseErr := client.Do(request)
+	if responseErr != nil {
+		log.Printf("Response error")
+		return false
+	}
+	if response.Status != "204 No Content" {
+		log.Printf("Success, Eureka was found")
+		return true
+	}
+	return false
 }
 
 func GetLocalIpAddress() string {
