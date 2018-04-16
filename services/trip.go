@@ -4,29 +4,25 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"github.com/AITestingOrg/calculation-service/models"
-	"net/http"
+	"github.com/AITestingOrg/calculation-service/utils"
+	"io/ioutil"
 	"log"
-	"encoding/xml"
-	"os"
+	"net/http"
 	"time"
 )
 
-type Instance struct {
-    IpAddress struct {
-        InnerXML string `xml:",innerxml"`
-    } `xml:"instance>ipAddr"`
-}
-
 func GetGmapsEstimation(trip models.Trip) models.Estimation {
 
-	ipAddress := getIpAddress()
+	ipAddress := utils.GetIpAddress()
+	if ipAddress == "" {
+		ipAddress = "localhost"
+	}
+	log.Printf("IP Address found: " + ipAddress)
 
 	// Encode trip
 	encodedTrip, marshallErr := json.Marshal(trip)
 	if marshallErr != nil {
-		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 
@@ -63,55 +59,23 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 
 	//Get duration and distance from gmaps request
 	gmapsEstimation := GetGmapsEstimation(trip)
-	var duration = float64(gmapsEstimation.Duration/60)
-	var distance = float64(int(gmapsEstimation.Distance/1609 * 100)) / 100
+	var duration = float64(gmapsEstimation.Duration / 60)
+	var distance = float64(int(gmapsEstimation.Distance/1609*100)) / 100
 
 	//Calculates cost
 	log.Printf("Calculating costs...")
-	var costDuration = (duration)*costPerMinute
-	var costDistance = (distance)*costPerMile
-	var finalCost = float64(int((costDuration + costDistance) * 100)) / 100
+	var costDuration = (duration) * costPerMinute
+	var costDistance = (distance) * costPerMile
+	var finalCost = float64(int((costDuration+costDistance)*100)) / 100
 
 	//Maps response to JSON body
-	currentDate := time.Now().Format("Jan 02 2006")
-	encodedEstimation, marshallErr := json.Marshal(models.Estimation{ Cost: finalCost, 
+	currentDate := time.Now().Format("2006-01-02 03:04:05")
+	encodedEstimation, marshallErr := json.Marshal(models.Estimation{Cost: finalCost,
 		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
 		LastUpdated: currentDate})
 	if marshallErr != nil {
-		fmt.Println(marshallErr)
 		panic(marshallErr)
 	}
 
 	return encodedEstimation
-}
-
-func getIpAddress() string {
-
-	eureka := os.Getenv("EUREKA_SERVER")
-	url := fmt.Sprintf("http://%s:8761/eureka/apps/gmapsadapter", eureka)
-
-	//Check to for local run
-	if eureka == "" {
-		return "localhost"
-	}
-	request, _ := http.NewRequest("GET", url, nil)
-
-	client := &http.Client{}
-	response, responseErr := client.Do(request)
-	if responseErr != nil {
-		panic(responseErr)
-	}
-
-	log.Printf("Reading XML body...")
-	body, _ := ioutil.ReadAll(response.Body)
-
-	var instance Instance
-	unmarshallError := xml.Unmarshal(body, &instance)
-	if unmarshallError != nil {
-		panic(unmarshallError)
-	}
-
-	log.Printf("Received Ip Address!")
-
-	return instance.IpAddress.InnerXML
 }
