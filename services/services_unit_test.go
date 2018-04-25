@@ -44,7 +44,7 @@ func TestGetGmapsEstimation(t *testing.T) {
 		Destination: "Weston",
 	}
 
-	result := GetGmapsEstimation(*trip)
+	result, err := GetGmapsEstimation(*trip)
 
 	assert.NotNil(t, result)
 	assert.Equal(t, float64(59485), result.Distance)
@@ -97,7 +97,7 @@ func TestCalculateCost(t *testing.T) {
 		Destination: "3400 NE 163rd St, North Miami Beach, FL 33160",
 	}
 
-	result := CalculateCost(*trip, *estimation)
+	result, err := CalculateCost(*trip, *estimation)
 	resultBody := models.Estimation{}
 	json.Unmarshal(result, &resultBody)
 
