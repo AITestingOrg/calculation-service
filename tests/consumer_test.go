@@ -26,11 +26,10 @@ func TestConsumer(t *testing.T) {
 
 	//Trip Model
 	trip := models.Trip {
-		Origin: "9700 Collins Ave, Bal Harbour, FL 33154",
-		Destination: "2250 N Commerce Pkwy, Weston, FL 33326",
-	}	
-	currentTime := time.Now().Unix()
-	trip.DepartureTime = currentTime
+        Origin: "9700 Collins Ave, Bal Harbour, FL 33154",
+        Destination: "2250 N Commerce Pkwy, Weston, FL 33326",
+        DepartureTime: 1523340999999999
+    }
 
 	// Pass in test case
 	var test = func() error {
