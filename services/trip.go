@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func GetGmapsEstimation(trip models.Trip) models.Estimation {
+func GetGmapsEstimation(trip models.Trip) (models.Estimation, error) {
 
 	ipAddress := utils.GetIpAddress()
 	if ipAddress == "" {
@@ -45,20 +45,23 @@ func GetGmapsEstimation(trip models.Trip) models.Estimation {
 	decodedEstimation := models.Estimation{}
 	unmarshallError := json.Unmarshal(body, &decodedEstimation)
 	if unmarshallError != nil {
-		panic(unmarshallError)
+		return decodedEstimation, unmarshallError
 	}
 	log.Printf("Received information from Gmaps adapter!")
-	return decodedEstimation
+	return decodedEstimation, nil
 }
 
-func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
+func CalculateCost(trip models.Trip, estimation models.Estimation) ([]byte, error) {
 
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9
 
 	//Get duration and distance from gmaps request
-	gmapsEstimation := GetGmapsEstimation(trip)
+	gmapsEstimation, err := GetGmapsEstimation(trip)
+	if err != nil {
+		return nil, err
+	}
 	var duration = float64(gmapsEstimation.Duration / 60)
 	var distance = float64(int(gmapsEstimation.Distance/1609*100)) / 100
 
@@ -74,8 +77,8 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) []byte {
 		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
 		LastUpdated: currentDate})
 	if marshallErr != nil {
-		panic(marshallErr)
+		return nil, marshallErr
 	}
 
-	return encodedEstimation
+	return encodedEstimation, nil
 }
