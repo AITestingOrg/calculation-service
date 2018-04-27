@@ -65,3 +65,54 @@ func TestGetCost(t *testing.T) {
 	assert.Equal(t, 44.97, estimation.Cost)
 
 }
+
+func TestGetCostInvalidStrings(t *testing.T) {
+
+	estimation := &models.Estimation{}
+
+	trip := &models.Trip{
+		Origin:      "",
+		Destination: "",
+	}
+
+	jsonTrip, _ := json.Marshal(trip)
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/cost", bytes.NewBuffer(jsonTrip))
+	response := httptest.NewRecorder()
+	http.DefaultServeMux.ServeHTTP(response, request)
+
+	json.NewDecoder(response.Body).Decode(&estimation)
+
+	assert.Equal(t, 400, response.Code)
+}
+
+func TestGetCostWhenCalculateCostThrowsError(t *testing.T) {
+	data :=
+		`<instance>
+	</instance>`
+
+	estimation := &models.Estimation{}
+
+	encodedData, err := xml.Marshal(data)
+	if err != nil {
+		panic(err)
+	}
+
+	httpmock.Activate()
+	httpmock.RegisterResponder("GET", "http://discovery-service:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
+	httpmock.RegisterResponder("POST", "http://localhost:8080/api/v1/directions", httpmock.NewBytesResponder(400, nil))
+	defer httpmock.Deactivate()
+
+	trip := &models.Trip{
+		Origin:      "Miami",
+		Destination: "Weston",
+	}
+
+	jsonTrip, _ := json.Marshal(trip)
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/cost", bytes.NewBuffer(jsonTrip))
+	response := httptest.NewRecorder()
+	http.DefaultServeMux.ServeHTTP(response, request)
+
+	json.NewDecoder(response.Body).Decode(&estimation)
+
+	assert.Equal(t, 400, response.Code)
+}
