@@ -1,14 +1,14 @@
 package tests
 
 import (
-	"os"
-	"fmt"
-	"testing"
-	"net/http"
-	"path/filepath"
 	"encoding/json"
+	"fmt"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/types"
+	"net/http"
+	"os"
+	"path/filepath"
+	"testing"
 )
 
 func startServer() {
@@ -30,8 +30,8 @@ func startServer() {
 		decoder := json.NewDecoder(req.Body)
 		decoder.Decode(&s)
 		if s.State == "STATE TO BE GIVEN BY TRIP-CMD" {
-			estimationReturned = 
-			` { "originAddress": ` + dsl.Like("9700 Collins Ave, Bal Harbour, FL 33154") + `,
+			estimationReturned =
+				` { "originAddress": ` + dsl.Like("9700 Collins Ave, Bal Harbour, FL 33154") + `,
 				"destinationAddress": ` + dsl.Like("2250 N Commerce Pkwy, Weston, FL 33326") + `,
 				"distance": ` + dsl.Like("2000.0") + `,
 				"duration": ` + dsl.Like("2000") + `,
@@ -53,7 +53,7 @@ func TestProvider(t *testing.T) {
 		Consumer: "Trip Management Service",
 		Provider: "Calculation Service",
 	}
-  
+
 	// Start provider API in the background
 	go startServer()
 	var dir, _ = os.Getwd()

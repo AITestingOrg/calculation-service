@@ -6,8 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"time"
 	"os"
+	"time"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 		}
 		eureka.PostToEureka()
 	}
-	
+
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

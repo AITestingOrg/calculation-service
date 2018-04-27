@@ -1,15 +1,15 @@
 package tests
 
 import (
-	"fmt"
-	"log"
-	"time"
 	"bytes"
-	"testing"
-	"net/http"
 	"encoding/json"
-	"github.com/pact-foundation/pact-go/dsl"
+	"fmt"
 	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/pact-foundation/pact-go/dsl"
+	"log"
+	"net/http"
+	"testing"
+	"time"
 )
 
 //Calculation consumes from the Gmaps adapter
@@ -25,11 +25,11 @@ func TestConsumer(t *testing.T) {
 	defer pact.Teardown()
 
 	//Trip Model
-	trip := models.Trip {
-        Origin: "9700 Collins Ave, Bal Harbour, FL 33154",
-        Destination: "2250 N Commerce Pkwy, Weston, FL 33326",
-        DepartureTime: 1523340999999999
-    }
+	trip := models.Trip{
+		Origin:        "9700 Collins Ave, Bal Harbour, FL 33154",
+		Destination:   "2250 N Commerce Pkwy, Weston, FL 33326",
+		DepartureTime: 1523340999999999,
+	}
 
 	// Pass in test case
 	var test = func() error {
@@ -67,8 +67,7 @@ func TestConsumer(t *testing.T) {
 		WillRespondWith(dsl.Response{
 			Status:  200,
 			Headers: map[string]string{"Content-Type": "application/json"},
-			Body:
-				`{ "distance": ` + dsl.Like("2000") + `,
+			Body: `{ "distance": ` + dsl.Like("2000") + `,
 				"duration": ` + dsl.Like("2000") + `
 				}`,
 		})
