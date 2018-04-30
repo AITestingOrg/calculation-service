@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	"calculation-service/models"
-	"calculation-service/utils"
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/utils"
 )
 
 func GetGmapsEstimation(trip models.Trip) (models.Estimation, error) {

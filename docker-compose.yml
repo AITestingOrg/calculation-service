@@ -4,7 +4,7 @@ services:
     image: springcloud/eureka
     ports:
       - "8761:8761"
-  gmaps-adapter:
+  gmapsadapter:
     depends_on:
       - discovery-service
     image: aista/gmaps-adapter
@@ -12,7 +12,7 @@ services:
       - "8080"
     environment:
       - EUREKA_SERVER=discovery-service
-  calculation-service:
+  calculationservice:
     depends_on:
       - discovery-service
     build: ./

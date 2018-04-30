@@ -1,4 +1,4 @@
-// +build !unit !integration
+// +build contract
 
 package tests
 
@@ -10,8 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"calculation-service/models"
-
+	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/pact-foundation/pact-go/dsl"
 )
 

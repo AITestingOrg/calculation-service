@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/models"
 
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"

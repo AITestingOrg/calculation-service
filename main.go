@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"calculation-service/controllers"
-	"calculation-service/eureka"
+	"github.com/AITestingOrg/calculation-service/controllers"
+	"github.com/AITestingOrg/calculation-service/eureka"
 
 	"github.com/gorilla/mux"
 )

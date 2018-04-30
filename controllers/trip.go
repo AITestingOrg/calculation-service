@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"calculation-service/models"
-	"calculation-service/services"
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/services"
 )
 
 func GetCost(w http.ResponseWriter, r *http.Request) {
