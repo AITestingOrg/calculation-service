@@ -3,7 +3,7 @@
     "name": "Calculation Service"
   },
   "provider": {
-    "name": "GMaps Adapter"
+    "name": "Gmaps Adapter"
   },
   "interactions": [
     {
@@ -18,7 +18,7 @@
         "body": {
           "origin": "9700 Collins Ave, Bal Harbour, FL 33154",
           "destination": "2250 N Commerce Pkwy, Weston, FL 33326",
-          "departureTime": 1523340999
+          "departureTime": 1523340999999999
         }
       },
       "response": {

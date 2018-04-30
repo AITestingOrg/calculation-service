@@ -1,5 +1,5 @@
-I, [2018-04-10T02:16:40.414648 #85182]  INFO -- : Registered expected interaction POST /api/v1/directions
-D, [2018-04-10T02:16:40.414910 #85182] DEBUG -- : {
+I, [2018-04-30T10:23:22.602161 #55123]  INFO -- : Registered expected interaction POST /api/v1/directions
+D, [2018-04-30T10:23:22.602528 #55123] DEBUG -- : {
   "description": "a POST request to get the duration and distance",
   "providerState": "Origin, destination, and current time",
   "request": {
@@ -11,7 +11,7 @@ D, [2018-04-10T02:16:40.414910 #85182] DEBUG -- : {
     "body": {
       "origin": "9700 Collins Ave, Bal Harbour, FL 33154",
       "destination": "2250 N Commerce Pkwy, Weston, FL 33326",
-      "departureTime": 1523340999
+      "departureTime": 1523340999999999
     }
   },
   "response": {
@@ -31,27 +31,27 @@ D, [2018-04-10T02:16:40.414910 #85182] DEBUG -- : {
     }
   }
 }
-I, [2018-04-10T02:16:40.417239 #85182]  INFO -- : Received request POST /api/v1/directions
-D, [2018-04-10T02:16:40.417337 #85182] DEBUG -- : {
+I, [2018-04-30T10:23:22.606269 #55123]  INFO -- : Received request POST /api/v1/directions
+D, [2018-04-30T10:23:22.606421 #55123] DEBUG -- : {
   "path": "/api/v1/directions",
   "query": "",
   "method": "post",
   "body": {
     "origin": "9700 Collins Ave, Bal Harbour, FL 33154",
     "destination": "2250 N Commerce Pkwy, Weston, FL 33326",
-    "departureTime": 1523340999
+    "departureTime": 1523340999999999
   },
   "headers": {
-    "Content-Length": "134",
+    "Content-Length": "140",
     "Content-Type": "application/json",
-    "Host": "localhost:62891",
+    "Host": "localhost:57408",
     "User-Agent": "Go-http-client/1.1",
     "Accept-Encoding": "gzip",
     "Version": "HTTP/1.1"
   }
 }
-I, [2018-04-10T02:16:40.417593 #85182]  INFO -- : Found matching response for POST /api/v1/directions
-D, [2018-04-10T02:16:40.417672 #85182] DEBUG -- : {
+I, [2018-04-30T10:23:22.606872 #55123]  INFO -- : Found matching response for POST /api/v1/directions
+D, [2018-04-30T10:23:22.607021 #55123] DEBUG -- : {
   "status": 200,
   "headers": {
     "Content-Type": "application/json"
@@ -67,5 +67,5 @@ D, [2018-04-10T02:16:40.417672 #85182] DEBUG -- : {
     }
   }
 }
-I, [2018-04-10T02:16:40.420398 #85182]  INFO -- : Verifying - interactions matched
-I, [2018-04-10T02:16:40.422028 #85182]  INFO -- : Cleared interactions
+I, [2018-04-30T10:23:22.611197 #55123]  INFO -- : Verifying - interactions matched
+I, [2018-04-30T10:23:22.613547 #55123]  INFO -- : Cleared interactions

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/pact-foundation/pact-go/dsl"
 	"log"
 	"net/http"
 	"testing"
-	"time"
+
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/pact-foundation/pact-go/dsl"
 )
 
 //Calculation consumes from the Gmaps adapter
