@@ -39,3 +39,11 @@ With body:
     "destination": "stringDestination"
 }
 ```
+
+
+## Running contract tests with pact:
+
+* Follow installation steps in the [guide](https://github.com/pact-foundation/pact-go) and make sure pact-go is recognized as a command.
+* In the terminal cd into the tests folder.
+* On a separate terminal run ```pact-go daemon```
+* Run ```go test -v -run TestConsumer```

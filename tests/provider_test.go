@@ -1,14 +1,16 @@
+// +build !unit
 package tests
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/pact-foundation/pact-go/types"
 	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/types"
 )
 
 func startServer() {
