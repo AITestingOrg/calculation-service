@@ -1,5 +1,5 @@
-I, [2018-04-30T10:23:22.602161 #55123]  INFO -- : Registered expected interaction POST /api/v1/directions
-D, [2018-04-30T10:23:22.602528 #55123] DEBUG -- : {
+I, [2018-04-30T13:31:04.626405 #75275]  INFO -- : Registered expected interaction POST /api/v1/directions
+D, [2018-04-30T13:31:04.626786 #75275] DEBUG -- : {
   "description": "a POST request to get the duration and distance",
   "providerState": "Origin, destination, and current time",
   "request": {
@@ -31,8 +31,8 @@ D, [2018-04-30T10:23:22.602528 #55123] DEBUG -- : {
     }
   }
 }
-I, [2018-04-30T10:23:22.606269 #55123]  INFO -- : Received request POST /api/v1/directions
-D, [2018-04-30T10:23:22.606421 #55123] DEBUG -- : {
+I, [2018-04-30T13:31:04.630509 #75275]  INFO -- : Received request POST /api/v1/directions
+D, [2018-04-30T13:31:04.630704 #75275] DEBUG -- : {
   "path": "/api/v1/directions",
   "query": "",
   "method": "post",
@@ -44,14 +44,14 @@ D, [2018-04-30T10:23:22.606421 #55123] DEBUG -- : {
   "headers": {
     "Content-Length": "140",
     "Content-Type": "application/json",
-    "Host": "localhost:57408",
+    "Host": "localhost:60629",
     "User-Agent": "Go-http-client/1.1",
     "Accept-Encoding": "gzip",
     "Version": "HTTP/1.1"
   }
 }
-I, [2018-04-30T10:23:22.606872 #55123]  INFO -- : Found matching response for POST /api/v1/directions
-D, [2018-04-30T10:23:22.607021 #55123] DEBUG -- : {
+I, [2018-04-30T13:31:04.631260 #75275]  INFO -- : Found matching response for POST /api/v1/directions
+D, [2018-04-30T13:31:04.631409 #75275] DEBUG -- : {
   "status": 200,
   "headers": {
     "Content-Type": "application/json"
@@ -67,5 +67,5 @@ D, [2018-04-30T10:23:22.607021 #55123] DEBUG -- : {
     }
   }
 }
-I, [2018-04-30T10:23:22.611197 #55123]  INFO -- : Verifying - interactions matched
-I, [2018-04-30T10:23:22.613547 #55123]  INFO -- : Cleared interactions
+I, [2018-04-30T13:31:04.637042 #75275]  INFO -- : Verifying - interactions matched
+I, [2018-04-30T13:31:04.640030 #75275]  INFO -- : Cleared interactions

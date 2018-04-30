@@ -6,12 +6,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"calculation-service/models"
+
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {

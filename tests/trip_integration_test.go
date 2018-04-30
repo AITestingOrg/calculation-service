@@ -5,14 +5,16 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/AITestingOrg/calculation-service/controllers"
-	"github.com/AITestingOrg/calculation-service/eureka"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"calculation-service/controllers"
+	"calculation-service/eureka"
+	"calculation-service/models"
+
+	"github.com/stretchr/testify/assert"
 )
 
 //Wait for Eureka to stand up before requesting any information during an integration test

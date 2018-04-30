@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/AITestingOrg/calculation-service/controllers"
-	"github.com/AITestingOrg/calculation-service/eureka"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"calculation-service/controllers"
+	"calculation-service/eureka"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -16,12 +18,12 @@ func main() {
 	log.Println("Calculation service is running...")
 
 	//Check to see if running locally or not
-	var localRun bool = false
+	var localRun = false
 	if os.Getenv("EUREKA_SERVER") == "" {
 		localRun = true
 	}
 	if !localRun {
-		var eurekaUp bool = false
+		var eurekaUp = false
 		log.Println("Waiting for Eureka...")
 		for eurekaUp != true {
 			eurekaUp = checkEurekaService(eurekaUp)
@@ -30,7 +32,7 @@ func main() {
 	}
 
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func checkEurekaService(eurekaUp bool) bool {

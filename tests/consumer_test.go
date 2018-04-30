@@ -1,4 +1,4 @@
-// +build !unit
+// +build !unit !integration
 
 package tests
 
@@ -10,7 +10,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/AITestingOrg/calculation-service/models"
+	"calculation-service/models"
+
 	"github.com/pact-foundation/pact-go/dsl"
 )
 

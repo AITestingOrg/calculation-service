@@ -1,4 +1,5 @@
 // +build !unit
+
 package tests
 
 import (
@@ -45,7 +46,7 @@ func startServer() {
 		w.Header().Add("Content-Type", "application/json")
 	})
 
-	go http.ListenAndServe(":8000", mux)
+	go http.ListenAndServe(":8080", mux)
 }
 
 //Calculation provides for Trip Management Service
@@ -62,8 +63,8 @@ func TestProvider(t *testing.T) {
 	var pactDir = fmt.Sprintf("%s/pacts", dir)
 	// Verify the Provider with local Pact Files
 	pact.VerifyProvider(t, types.VerifyRequest{
-		ProviderBaseURL:        "http://localhost:8000",
+		ProviderBaseURL:        "http://localhost:8080",
 		PactURLs:               []string{filepath.ToSlash(fmt.Sprintf("%s/PATH TO PACT JSON", pactDir))},
-		ProviderStatesSetupURL: "http://localhost:8000/setup",
+		ProviderStatesSetupURL: "http://localhost:8080/setup",
 	})
 }

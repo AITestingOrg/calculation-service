@@ -19,7 +19,7 @@ script:
 - go get github.com/pact-foundation/pact-go
 - go get github.com/stretchr/testify/assert && go get github.com/jarcoal/httpmock && go test -v -tags unit -cover ./...
 - calculation_id=$(docker ps -aqf "name=calculationservice_calculation-service_1")
-- docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -v -tags integration"
+- docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && pact-go daemon && go test -v -tags integration"
 
 after_success:
 - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;
