@@ -19,10 +19,8 @@ script:
 - go build
 - docker-compose up --build -d
 - go get github.com/pact-foundation/pact-go
-- pact-go daemon &
 - ./.travis.gofmt.sh
 - go get github.com/stretchr/testify/assert && go get github.com/jarcoal/httpmock && go test -v -tags unit -cover ./...
-- go test -v -tags contract ./...
 - calculation_id=$(docker ps -aqf "name=calculationservice_calculationservice_1")
 - docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -v -tags integration"
 
