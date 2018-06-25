@@ -1,7 +1,7 @@
 version: '3'  
 services:
   discovery-service:
-    image: springcloud/eureka
+    image: aista/eureka
     ports:
       - "8761:8761"
   gmaps-adapter:
