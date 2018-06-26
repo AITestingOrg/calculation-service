@@ -3,12 +3,13 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/AITestingOrg/calculation-service/services"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/services"
 )
 
 func GetCost(w http.ResponseWriter, r *http.Request) {

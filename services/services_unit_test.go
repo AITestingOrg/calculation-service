@@ -5,11 +5,13 @@ package services
 import (
 	"encoding/json"
 	"encoding/xml"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/AITestingOrg/calculation-service/models"
+
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetGmapsEstimation(t *testing.T) {
