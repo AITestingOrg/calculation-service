@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/AITestingOrg/calculation-service/utils"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/utils"
 )
 
 func GetGmapsEstimation(trip models.Trip) (models.Estimation, error) {

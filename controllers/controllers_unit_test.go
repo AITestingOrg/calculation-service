@@ -6,12 +6,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/AITestingOrg/calculation-service/models"
+
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -19,7 +21,6 @@ func init() {
 }
 
 func TestGetCost(t *testing.T) {
-
 	data :=
 		`<instance>
 		</instance>`
@@ -41,6 +42,7 @@ func TestGetCost(t *testing.T) {
 
 	httpmock.Activate()
 	httpmock.RegisterResponder("GET", "http://discovery-service:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
+	httpmock.RegisterResponder("GET", "http://localhost:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
 	httpmock.RegisterResponder("POST", "http://localhost:8080/api/v1/directions", httpmock.NewBytesResponder(200, encodedEstimation))
 	defer httpmock.Deactivate()
 
