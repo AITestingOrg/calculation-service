@@ -37,7 +37,7 @@ func PostToEureka() {
 	log.Printf("Registering with Eureka...")
 	eureka := os.Getenv("EUREKA_SERVER")
 	if eureka == "" {
-		eureka = "discovery-service"
+		eureka = "discoveryservice"
 	}
 	url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice", eureka)
 	json := []byte(jsonParsed)
@@ -63,7 +63,7 @@ func CheckEurekaService(eurekaUp bool) bool {
 
 	eureka := os.Getenv("EUREKA_SERVER")
 	if eureka == "" {
-		eureka = "discovery-service"
+		eureka = "discoveryservice"
 	}
 	url := fmt.Sprintf("http://%s:8761/eureka/", eureka)
 
