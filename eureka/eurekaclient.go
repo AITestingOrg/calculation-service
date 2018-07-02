@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"io/ioutil"
 )
 
 func PostToEureka() {
@@ -52,11 +53,16 @@ func PostToEureka() {
 	if responseErr != nil {
 		panic(responseErr)
 	}
-	if response.Status != "204 No Content" {
-		log.Printf(response.Status)
-		panic("ERROR: 204 Response Not Returned")
+	if response.StatusCode == 204 {
+		log.Printf("Registered with Eureka!")
+	} else {
+		log.Printf("Response Status: %s", response.Status)
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		log.Printf("Response Body: %s", string(body))
+		errorMessage := fmt.Sprintf("ERROR: Recieved response with status code: \"%d\"  but expected response with status 204. \nResponse Body: %s", response.StatusCode, string(body))
+		panic(errorMessage)
 	}
-	log.Printf("Registered with Eureka!")
 }
 
 func CheckEurekaService(eurekaUp bool) bool {
