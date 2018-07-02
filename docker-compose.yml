@@ -7,7 +7,7 @@ services:
   gmapsadapter:
     depends_on:
       - discoveryservice
-    image: aista/gmaps-adapter
+    build: ../gmaps-adapter/
     ports:
       - "8080"
     environment:
