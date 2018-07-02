@@ -38,7 +38,7 @@ func main() {
 func checkEurekaService(eurekaUp bool) bool {
 	duration := time.Duration(15) * time.Second
 	time.Sleep(duration)
-	url := "http://discovery-service:8761/eureka/"
+	url := "http://discoveryservice:8761/eureka/"
 	log.Println("Sending request to Eureka, waiting for response...")
 	request, _ := http.NewRequest("GET", url, nil)
 	request.Header.Set("Content-Type", "application/json")

@@ -41,7 +41,7 @@ func TestGetCost(t *testing.T) {
 	}
 
 	httpmock.Activate()
-	httpmock.RegisterResponder("GET", "http://discovery-service:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
+	httpmock.RegisterResponder("GET", "http://discoveryservice:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
 	httpmock.RegisterResponder("GET", "http://localhost:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
 	httpmock.RegisterResponder("POST", "http://localhost:8080/api/v1/directions", httpmock.NewBytesResponder(200, encodedEstimation))
 	defer httpmock.Deactivate()
@@ -100,7 +100,7 @@ func TestGetCostWhenCalculateCostThrowsError(t *testing.T) {
 	}
 
 	httpmock.Activate()
-	httpmock.RegisterResponder("GET", "http://discovery-service:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
+	httpmock.RegisterResponder("GET", "http://discoveryservice:8761/eureka/apps/gmapsadapter", httpmock.NewBytesResponder(200, encodedData))
 	httpmock.RegisterResponder("POST", "http://localhost:8080/api/v1/directions", httpmock.NewBytesResponder(400, nil))
 	defer httpmock.Deactivate()
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -21,9 +22,11 @@ func PostToEureka() {
 			VipAddress:       "calculationservice",
 			SecureVipAddress: "calculationservice",
 			Status:           "UP",
-			Port:             8080,
+			Port:             Port{8080, true},
+			HomePageUrl:      "http://" + localIpAddr + ":8080",
 			StatusPageUrl:    "http://" + localIpAddr + ":8080/api/v1/status",
-			DataCenterInfo:   DataCenter{Name: "MyOwn"},
+			HealthCheckUrl:   "http://" + localIpAddr + ":8080/api/v1/status",
+			DataCenterInfo:   DataCenter{"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo", "MyOwn"},
 			Metadata:         MetaData{InstanceId: ""},
 		},
 	}
@@ -37,7 +40,7 @@ func PostToEureka() {
 	log.Printf("Registering with Eureka...")
 	eureka := os.Getenv("EUREKA_SERVER")
 	if eureka == "" {
-		eureka = "discovery-service"
+		eureka = "discoveryservice"
 	}
 	url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice", eureka)
 	json := []byte(jsonParsed)
@@ -50,11 +53,16 @@ func PostToEureka() {
 	if responseErr != nil {
 		panic(responseErr)
 	}
-	if response.Status != "204 No Content" {
-		log.Printf(response.Status)
-		panic("ERROR: 204 Response Not Returned")
+	if response.StatusCode == 204 {
+		log.Printf("Registered with Eureka!")
+	} else {
+		log.Printf("Response Status: %s", response.Status)
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		log.Printf("Response Body: %s", string(body))
+		errorMessage := fmt.Sprintf("ERROR: Recieved response with status code: \"%d\"  but expected response with status 204. \nResponse Body: %s", response.StatusCode, string(body))
+		panic(errorMessage)
 	}
-	log.Printf("Registered with Eureka!")
 }
 
 func CheckEurekaService(eurekaUp bool) bool {
@@ -63,7 +71,7 @@ func CheckEurekaService(eurekaUp bool) bool {
 
 	eureka := os.Getenv("EUREKA_SERVER")
 	if eureka == "" {
-		eureka = "discovery-service"
+		eureka = "discoveryservice"
 	}
 	url := fmt.Sprintf("http://%s:8761/eureka/", eureka)
 

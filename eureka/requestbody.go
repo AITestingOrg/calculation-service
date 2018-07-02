@@ -11,7 +11,7 @@ type Instance struct {
 	VipAddress       string     `json:"vipAddress"`
 	SecureVipAddress string     `json:"secureVipAddress"`
 	Status           string     `json:"status"`
-	Port             int        `json:"port"`
+	Port             Port       `json:"port"`
 	HomePageUrl      string     `json:"homePageUrl"`
 	StatusPageUrl    string     `json:"statusPageUrl"`
 	HealthCheckUrl   string     `json:"healthCheckUrl"`
@@ -19,8 +19,14 @@ type Instance struct {
 	Metadata         MetaData   `json:"metadata"`
 }
 
+type Port struct {
+	PortNum int  `json:"$"`
+	Enabled bool `json:"@enabled"`
+}
+
 type DataCenter struct {
-	Name string `json:"name"`
+	Class string `json:"@class"`
+	Name  string `json:"name"`
 }
 
 type MetaData struct {

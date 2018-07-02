@@ -18,7 +18,7 @@ type Instance struct {
 func GetIpAddress() string {
 	eureka := os.Getenv("EUREKA_SERVER")
 	if eureka == "" {
-		eureka = "discovery-service"
+		eureka = "discoveryservice"
 	}
 	url := fmt.Sprintf("http://%s:8761/eureka/apps/gmapsadapter", eureka)
 
