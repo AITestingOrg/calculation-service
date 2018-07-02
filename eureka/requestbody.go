@@ -26,7 +26,7 @@ type Port struct {
 
 type DataCenter struct {
 	Class string `json:"@class"`
-	Name string  `json:"name"`
+	Name  string `json:"name"`
 }
 
 type MetaData struct {
