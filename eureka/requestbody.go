@@ -20,13 +20,13 @@ type Instance struct {
 }
 
 type Port struct {
-	PortNum int `json:"$"`
+	PortNum int  `json:"$"`
 	Enabled bool `json:"@enabled"`
 }
 
 type DataCenter struct {
 	Class string `json:"@class"`
-	Name string `json:"name"`
+	Name string  `json:"name"`
 }
 
 type MetaData struct {

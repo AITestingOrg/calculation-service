@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"time"
-	"io/ioutil"
 )
 
 func PostToEureka() {
@@ -22,8 +22,8 @@ func PostToEureka() {
 			VipAddress:       "calculationservice",
 			SecureVipAddress: "calculationservice",
 			Status:           "UP",
-			Port:             Port{ 8080, true},
-			HomePageUrl: 	  "http://" + localIpAddr + ":8080",
+			Port:             Port{8080, true},
+			HomePageUrl:      "http://" + localIpAddr + ":8080",
 			StatusPageUrl:    "http://" + localIpAddr + ":8080/api/v1/status",
 			HealthCheckUrl:   "http://" + localIpAddr + ":8080/api/v1/status",
 			DataCenterInfo:   DataCenter{"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo", "MyOwn"},
