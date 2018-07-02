@@ -21,9 +21,11 @@ func PostToEureka() {
 			VipAddress:       "calculationservice",
 			SecureVipAddress: "calculationservice",
 			Status:           "UP",
-			Port:             8080,
+			Port:             Port{ 8080, true},
+			HomePageUrl: 	  "http://" + localIpAddr + ":8080",
 			StatusPageUrl:    "http://" + localIpAddr + ":8080/api/v1/status",
-			DataCenterInfo:   DataCenter{Name: "MyOwn"},
+			HealthCheckUrl:   "http://" + localIpAddr + ":8080/api/v1/status",
+			DataCenterInfo:   DataCenter{"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo", "MyOwn"},
 			Metadata:         MetaData{InstanceId: ""},
 		},
 	}
