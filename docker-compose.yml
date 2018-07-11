@@ -15,7 +15,7 @@ services:
   calculationservice:
     depends_on:
       - discoveryservice
-    build: ./
+    image: aista/calculation-service
     command: ["go", "run", "main.go"]
     ports:
       - "8080"

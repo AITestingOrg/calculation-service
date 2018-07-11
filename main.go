@@ -29,6 +29,7 @@ func main() {
 			eurekaUp = checkEurekaService(eurekaUp)
 		}
 		eureka.PostToEureka()
+		eureka.StartHeartbeat()
 	}
 
 	http.Handle("/", r)
