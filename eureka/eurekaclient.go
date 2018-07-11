@@ -91,6 +91,26 @@ func CheckEurekaService(eurekaUp bool) bool {
 	return false
 }
 
+func StartHeartbeat() {
+	log.Printf("Initializing heartbeat for every 30 seconds")
+	ticker := time.NewTicker(time.Second * 30)
+	go func() {
+		for range ticker.C {
+			log.Printf("Sending heartbeat to Eureka...")
+			eureka := os.Getenv("EUREKA_SERVER")
+			if eureka == "" {
+				eureka = "discoveryservice"
+			}
+			url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice/%s", eureka, GetLocalIpAddress())
+			request, _ := http.NewRequest("PUT", url, nil)
+			request.Header.Add("Content-Type", "application/json")
+			client := &http.Client{}
+			client.Do(request)
+			log.Printf("Heartbeat sent to Eureka")
+		}
+	}()
+}
+
 func GetLocalIpAddress() string {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
