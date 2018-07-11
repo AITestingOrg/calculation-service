@@ -10,12 +10,24 @@ import (
 	"github.com/AITestingOrg/calculation-service/eureka"
 
 	"github.com/gorilla/mux"
+
+	"fmt"
+	"github.com/streadway/amqp"
 )
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+
+		panic(fmt.Sprintf("%s: %s", msg, err))
+	}
+}
 
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/cost", controllers.GetCost).Methods("POST")
 	log.Println("Calculation service is running...")
+
 
 	//Check to see if running locally or not
 	var localRun = false
@@ -29,10 +41,89 @@ func main() {
 			eurekaUp = checkEurekaService(eurekaUp)
 		}
 		eureka.PostToEureka()
+		eureka.StartHeartbeat()
+		log.Printf("After scheduling heartbeat")
 	}
 
-	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	//http.Handle("/", r)
+	//log.Fatal(http.ListenAndServe(":8080", nil))
+
+
+	log.Printf("before dialing rabbitmq")
+
+	conn, err := amqp.Dial("amqp://guest:guest@" + os.Getenv("RABBIT_HOST") + ":5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	log.Printf("after dialing rabbitmq")
+
+	err = ch.ExchangeDeclare(
+		"trip-calculation-exchange",
+		"topic",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	failOnError(err, "Failed to declare an exchange")
+
+	log.Printf("after declaring exchange")
+
+	q, err := ch.QueueDeclare(
+		"trip-calculation-queue",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+
+
+	log.Printf("Declared queue: " + q.Name)
+
+	failOnError(err, "Failed to declare the queue, trip-calculation-queue")
+
+	body := "hello from calculation service"
+	err = ch.Publish(
+		"trip-calculation-exchange",
+		q.Name,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: 	"text/plain",
+			Body:			[]byte(body),
+		})
+	failOnError(err, "Failed to publish the hello message")
+
+	log.Printf("Declared queue: " + q.Name)
+
+	msgs, err := ch.Consume(
+		q.Name,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	failOnError(err, "Failed to register a consumer")
+
+	forever := make(chan bool)
+
+	go func() {
+		for d := range msgs {
+			log.Printf("Received a message: %s", d.Body)
+		}
+	}()
+
+	log.Printf(" [*] Waiting for messages")
+	<-forever
 }
 
 func checkEurekaService(eurekaUp bool) bool {
