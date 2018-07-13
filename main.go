@@ -68,7 +68,7 @@ func main() {
 		data := msg.Body
 		var estimation models.Estimation
 		json.Unmarshal(data, estimation)
-		log.Printf("Message received and unmarshaled into an estimation object: %s", estimation.)
+		log.Printf("Message received and unmarshaled into an estimation object: %s", estimation)
 	}
 
 	log.Printf("After defining generic MessageReceived and serve")
