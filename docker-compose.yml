@@ -1,23 +1,32 @@
-version: '3'  
+version: '3'
 services:
   discoveryservice:
     image: aista/eureka
     ports:
       - "8761:8761"
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   gmapsadapter:
     depends_on:
       - discoveryservice
-    image: aista/gmaps-adapter
+    image: aista/gmaps-adapter:local
     ports:
       - "8080"
     environment:
+      - RABBIT_HOST=rabbitmq
       - EUREKA_SERVER=discoveryservice
+
   calculationservice:
     depends_on:
       - discoveryservice
-    build: ./
-    command: ["go", "run", "main.go"]
+    image: aista/calculation-service:local
     ports:
       - "8080"
     environment:
+      - RABBIT_HOST=rabbitmq
       - EUREKA_SERVER=discoveryservice

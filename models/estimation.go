@@ -7,4 +7,5 @@ type Estimation struct {
 	Duration    int64   `json:"duration"`
 	Cost        float64 `json:"cost"`
 	LastUpdated string  `json:"lastUpdated"`
+	UserId 		string  `json:"userId"`
 }

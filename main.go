@@ -8,11 +8,14 @@ import (
 
 	"github.com/AITestingOrg/calculation-service/controllers"
 	"github.com/AITestingOrg/calculation-service/eureka"
+	"github.com/AITestingOrg/calculation-service/utils"
 
 	"github.com/gorilla/mux"
 
 	"fmt"
 	"github.com/streadway/amqp"
+	"github.com/AITestingOrg/calculation-service/models"
+	"encoding/json"
 )
 
 func failOnError(err error, msg string) {
@@ -27,7 +30,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/cost", controllers.GetCost).Methods("POST")
 	log.Println("Calculation service is running...")
-
 
 	//Check to see if running locally or not
 	var localRun = false
@@ -45,85 +47,43 @@ func main() {
 		log.Printf("After scheduling heartbeat")
 	}
 
-	//http.Handle("/", r)
-	//log.Fatal(http.ListenAndServe(":8080", nil))
-
-
-	log.Printf("before dialing rabbitmq")
-
-	conn, err := amqp.Dial("amqp://guest:guest@" + os.Getenv("RABBIT_HOST") + ":5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	log.Printf("after dialing rabbitmq")
-
-	err = ch.ExchangeDeclare(
-		"trip-calculation-exchange",
-		"topic",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-
-	failOnError(err, "Failed to declare an exchange")
-
-	log.Printf("after declaring exchange")
-
-	q, err := ch.QueueDeclare(
-		"trip-calculation-queue",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-
-
-
-	log.Printf("Declared queue: " + q.Name)
-
-	failOnError(err, "Failed to declare the queue, trip-calculation-queue")
-
-	body := "hello from calculation service"
-	err = ch.Publish(
-		"trip-calculation-exchange",
-		q.Name,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: 	"text/plain",
-			Body:			[]byte(body),
-		})
-	failOnError(err, "Failed to publish the hello message")
-
-	log.Printf("Declared queue: " + q.Name)
-
-	msgs, err := ch.Consume(
-		q.Name,
-		"",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	failOnError(err, "Failed to register a consumer")
-
 	forever := make(chan bool)
 
+	http.Handle("/", r)
+	log.Printf("After http.handle")
+
 	go func() {
-		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-		}
+		log.Printf("inside:: before listen and serve")
+		log.Fatal(http.ListenAndServe(":8080", nil))
+		log.Printf("inside:: after listen and serve")
 	}()
 
-	log.Printf(" [*] Waiting for messages")
-	<-forever
+	log.Printf("After listen and serve")
+	genericMessageReceived := func (msg amqp.Delivery){
+		log.Printf("Message received on exchange: %s\nWith routing key: %s\nWith body: %s", msg.Exchange, msg.RoutingKey, msg.Body)
+	}
+
+	estimateReceived := func(msg amqp.Delivery){
+		genericMessageReceived(msg)
+		data := msg.Body
+		var estimation models.Estimation
+		json.Unmarshal(data, estimation)
+		log.Printf("Message received and unmarshaled into an estimation object: %s", estimation.)
+	}
+
+	log.Printf("After defining generic MessageReceived and serve")
+
+	go func() {
+		utils.InitializeConsumer("eventBusTrip", "fanout", "eventQueueTripCalculation", "", genericMessageReceived)
+	}()
+
+	log.Printf("After initialize eventBusTrip Consumer")
+	go func() {
+		utils.InitializeConsumer("trip.exchange.tripcalculation", "topic", "trip.queue.calculationservice.calculatecost", "trip.estimation.estimatecalculated", estimateReceived)
+	}()
+	log.Printf("After initialize trip.exchange.tripcalculation Consumer")
+
+	<- forever
 }
 
 func checkEurekaService(eurekaUp bool) bool {

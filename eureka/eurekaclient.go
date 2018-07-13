@@ -76,7 +76,6 @@ func StartHeartbeat() {
 				eureka = "discoveryservice"
 			}
 			url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice/%s", eureka, GetLocalIpAddress())
-			log.Printf("Put request to: %s", url)
 			request, _ := http.NewRequest("PUT", url, nil)
 			request.Header.Add("Content-Type", "application/json")
 			client := &http.Client{}

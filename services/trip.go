@@ -1,68 +1,76 @@
 package services
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/AITestingOrg/calculation-service/models"
+	"fmt"
 	"github.com/AITestingOrg/calculation-service/utils"
 )
 
-func GetGmapsEstimation(trip models.Trip) (models.Estimation, error) {
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
 
-	ipAddress := utils.GetIpAddress()
-	if ipAddress == "" {
-		ipAddress = "localhost"
+		panic(fmt.Sprintf("%s: %s", msg, err))
 	}
-	log.Printf("IP Address found: " + ipAddress)
+}
 
-	// Encode trip
-	encodedTrip, marshallErr := json.Marshal(trip)
+func EmitGmapsEstimationRequest(tripEstimateRequest models.TripEstimateRequest){
+	//
+	//ipAddress := utils.GetIpAddress()
+	//if ipAddress == "" {
+	//	ipAddress = "localhost"
+	//}
+	//log.Printf("IP Address found: " + ipAddress)
+	//
+	//// Encode trip
+	//encodedTrip, marshallErr := json.Marshal(trip)
+	//if marshallErr != nil {
+	//	panic(marshallErr)
+	//}
+	//
+	//// Request estimation
+	//log.Printf("Requesting information from Gmaps adapter...")
+	//url := fmt.Sprintf("http://%s:8080/api/v1/directions", ipAddress)
+	//
+	//request, _ := http.NewRequest("POST", url, bytes.NewBuffer(encodedTrip))
+	//request.Header.Set("Content-Type", "application/json")
+	//
+	//client := &http.Client{}
+	//response, responseErr := client.Do(request)
+	//if responseErr != nil {
+	//	panic(responseErr)
+	//}
+	//defer response.Body.Close()
+	//body, _ := ioutil.ReadAll(response.Body)
+	//
+	//// Decode response
+	//decodedEstimation := models.Estimation{}
+	//unmarshallError := json.Unmarshal(body, &decodedEstimation)
+	//if unmarshallError != nil {
+	//	return decodedEstimation, unmarshallError
+	//}
+	//log.Printf("Received information from Gmaps adapter!")
+	//return decodedEstimation, nil
+
+	encodedTripEstimate, marshallErr := json.Marshal(tripEstimateRequest)
 	if marshallErr != nil {
 		panic(marshallErr)
 	}
-
-	// Request estimation
-	log.Printf("Requesting information from Gmaps adapter...")
-	url := fmt.Sprintf("http://%s:8080/api/v1/directions", ipAddress)
-
-	request, _ := http.NewRequest("POST", url, bytes.NewBuffer(encodedTrip))
-	request.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	response, responseErr := client.Do(request)
-	if responseErr != nil {
-		panic(responseErr)
-	}
-	defer response.Body.Close()
-	body, _ := ioutil.ReadAll(response.Body)
-
-	// Decode response
-	decodedEstimation := models.Estimation{}
-	unmarshallError := json.Unmarshal(body, &decodedEstimation)
-	if unmarshallError != nil {
-		return decodedEstimation, unmarshallError
-	}
-	log.Printf("Received information from Gmaps adapter!")
-	return decodedEstimation, nil
+	//Emit to trip.exchange.tripcalculation, with key trip.estimation.estimaterequested
+	utils.PublishMessage("trip.exchange.tripcalculation", "trip.estimation.estimaterequested", encodedTripEstimate)
 }
 
-func CalculateCost(trip models.Trip, estimation models.Estimation) ([]byte, error) {
+func CalculateCost(trip models.TripEstimateRequest, gmapsEstimation models.Estimation) ([]byte, error) {
 
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9
 
 	//Get duration and distance from gmaps request
-	gmapsEstimation, err := GetGmapsEstimation(trip)
-	if err != nil {
-		return nil, err
-	}
 	var duration = float64(gmapsEstimation.Duration / 60)
 	var distance = float64(int(gmapsEstimation.Distance/1609*100)) / 100
 
@@ -80,6 +88,5 @@ func CalculateCost(trip models.Trip, estimation models.Estimation) ([]byte, erro
 	if marshallErr != nil {
 		return nil, marshallErr
 	}
-
 	return encodedEstimation, nil
 }

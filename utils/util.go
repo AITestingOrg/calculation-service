@@ -60,6 +60,6 @@ func retryGET(maxAttempts int, url string) {
 		}
 	}
 	if response.Status != "200 OK" {
-		log.Printf("Response was never successful, please increase attempts")
+		log.Printf("Response status: %s returned. Response was never successful, please increase attempts", response.Status)
 	}
 }
