@@ -16,6 +16,7 @@ import (
 	"github.com/streadway/amqp"
 	"github.com/AITestingOrg/calculation-service/models"
 	"encoding/json"
+	"github.com/AITestingOrg/calculation-service/services"
 )
 
 func failOnError(err error, msg string) {
@@ -55,10 +56,8 @@ func main() {
 	go func() {
 		log.Printf("inside:: before listen and serve")
 		log.Fatal(http.ListenAndServe(":8080", nil))
-		log.Printf("inside:: after listen and serve")
 	}()
 
-	log.Printf("After listen and serve")
 	genericMessageReceived := func (msg amqp.Delivery){
 		log.Printf("Message received on exchange: %s\nWith routing key: %s\nWith body: %s", msg.Exchange, msg.RoutingKey, msg.Body)
 	}
@@ -67,7 +66,9 @@ func main() {
 		genericMessageReceived(msg)
 		data := msg.Body
 		var estimation models.Estimation
-		json.Unmarshal(data, estimation)
+		json.Unmarshal(data, &estimation)
+		estimate, _ := services.CalculateCost(estimation)
+		utils.PublishMessage("notification.exchange.notification", "notification.trip.estimatecalculated", estimate)
 		log.Printf("Message received and unmarshaled into an estimation object: %s", estimation)
 	}
 

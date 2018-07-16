@@ -14,6 +14,7 @@ services:
   gmapsadapter:
     depends_on:
       - discoveryservice
+      - rabbitmq
     image: aista/gmaps-adapter:local
     ports:
       - "8080"
@@ -24,9 +25,22 @@ services:
   calculationservice:
     depends_on:
       - discoveryservice
+      - rabbitmq
     image: aista/calculation-service:local
     ports:
       - "8080"
     environment:
       - RABBIT_HOST=rabbitmq
       - EUREKA_SERVER=discoveryservice
+
+  notificationservice:
+    depends_on:
+      - discoveryservice
+      - rabbitmq
+    image: aista/notification-service:local
+    command: notification-service
+    ports:
+      - "32700:32700"
+    environment:
+      - EUREKA_SERVER=discoveryservice
+      - RABBIT_HOST=rabbitmq

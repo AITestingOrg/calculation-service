@@ -64,7 +64,7 @@ func EmitGmapsEstimationRequest(tripEstimateRequest models.TripEstimateRequest){
 	utils.PublishMessage("trip.exchange.tripcalculation", "trip.estimation.estimaterequested", encodedTripEstimate)
 }
 
-func CalculateCost(trip models.TripEstimateRequest, gmapsEstimation models.Estimation) ([]byte, error) {
+func CalculateCost(gmapsEstimation models.Estimation) ([]byte, error) {
 
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
@@ -82,9 +82,16 @@ func CalculateCost(trip models.TripEstimateRequest, gmapsEstimation models.Estim
 
 	//Maps response to JSON body
 	currentDate := time.Now().Format("2006-01-02 03:04:05")
-	encodedEstimation, marshallErr := json.Marshal(models.Estimation{Cost: finalCost,
-		Duration: int64(duration), Distance: distance, Origin: trip.Origin, Destination: trip.Destination,
-		LastUpdated: currentDate})
+	encodedEstimation, marshallErr := json.Marshal(
+		models.Estimation{
+		Cost: finalCost,
+		Duration: int64(duration),
+		Distance: distance,
+		Origin: gmapsEstimation.Origin,
+		Destination: gmapsEstimation.Destination,
+		LastUpdated: currentDate,
+		UserId: gmapsEstimation.UserId,
+	})
 	if marshallErr != nil {
 		return nil, marshallErr
 	}
