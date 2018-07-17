@@ -33,7 +33,22 @@ func StopPublishingMessagesFromChannel() {
 }
 
 func InitializeRabbitMqPublisher() {
-	conn, err := amqp.Dial("amqp://guest:guest@" + os.Getenv("RABBIT_HOST") + ":5672/")
+	rabbitUsername := os.Getenv("RABBIT_USERNAME")
+	if rabbitUsername == "" {
+		rabbitUsername = "guest"
+	}
+
+	rabbitPassword := os.Getenv("RABBIT_PASSWORD")
+	if rabbitPassword == "" {
+		rabbitPassword = "guest"
+	}
+
+	rabbitHost := os.Getenv("RABBIT_HOST")
+	if rabbitHost == "" {
+		rabbitHost = "localhost"
+	}
+
+	conn, err := amqp.Dial("amqp://" + rabbitUsername + ":" + rabbitPassword + "@" + rabbitHost + ":5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 	ch, err := conn.Channel()
