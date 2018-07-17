@@ -9,11 +9,18 @@ import (
 	"time"
 
 	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/AITestingOrg/calculation-service/services"
+	"github.com/AITestingOrg/calculation-service/utils"
+	"github.com/gorilla/mux"
 )
 
-//need to change this to take in trip and user id
-func GetCost(w http.ResponseWriter, r *http.Request) {
+func InitializeEndpoint(){
+	r := mux.NewRouter()
+	r.HandleFunc("/api/v1/cost", getCost).Methods("POST")
+	http.Handle("/", r)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func getCost(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 
 	//Converts objects into json
@@ -28,26 +35,14 @@ func GetCost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tripEstimate models.TripEstimateRequest
-	json.Unmarshal(body, &tripEstimate)
-
-	//Sets depature time to current time
+	//Sets departure time to current time
 	log.Printf("Setting current time for TripEstimate...")
 	currentTime := time.Now().Unix()
-	tripEstimate.DepartureTime = currentTime
+	trip.DepartureTime = currentTime
 
-	services.EmitGmapsEstimationRequest(tripEstimate)
+	//Emit to trip.exchange.tripcalculation, with key trip.estimation.estimaterequested
+	utils.PublishMessage("trip.exchange.tripcalculation", "trip.estimation.estimaterequested", trip)
 
-	//
-	////Receives calculated cost and returns as json
-	//if err != nil {
-	//	err := errors.New("ERROR: Invalid trip request")
-	//	log.Print(err)
-	//	http.Error(w, err.Error(), 400)
-	//	return
-	//}
-	//log.Printf("Distance, duration, and cost estimations returned!")
-	//
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte("Trip Estimate Request Retrieved. Forwarding request to Gmaps Adapter"))
 }
