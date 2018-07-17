@@ -37,6 +37,7 @@ With body:
 {
     "origin": "stringOrigin",
     "destination": "stringDestination"
+    "userId": "stringUUID"
 }
 ```
 
