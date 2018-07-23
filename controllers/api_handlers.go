@@ -50,9 +50,9 @@ func (controller CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Requ
 }
 
 func (handler CostEstimateHandler) GetPath() string{
-	return handler.Path
+	return "/api/v1/path"
 }
 
 func (handler CostEstimateHandler) GetRequestType() string{
-	return handler.RequestType
+	return "POST"
 }
