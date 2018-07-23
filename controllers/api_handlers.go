@@ -13,8 +13,6 @@ import (
 
 type CostEstimateHandler struct {
 	Publisher interfaces.PublisherInterface
-	Path string
-	RequestType string
 }
 
 func (controller CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
