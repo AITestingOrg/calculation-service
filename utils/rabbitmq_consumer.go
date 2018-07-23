@@ -3,34 +3,21 @@ package utils
 import (
 	"github.com/streadway/amqp"
 	"log"
-	"os"
+	"github.com/AITestingOrg/calculation-service/handlers"
 )
 
-type Consumer struct {
+type AmqpConsumer struct {
 	ExchangeName string
 	ExchangeKind string
 	QueueName string
 	QueueBinding string
-	Handle func(msg amqp.Delivery)
+	Handler handlers.EstimateHandler
 }
 
-func (consumer Consumer) InitializeConsumer() {
-	rabbitUsername := os.Getenv("RABBIT_USERNAME")
-	if rabbitUsername == "" {
-		rabbitUsername = "guest"
-	}
+func (consumer AmqpConsumer) InitializeConsumer() {
+	rabbitCreds := GetRabbitCredentials()
 
-	rabbitPassword := os.Getenv("RABBIT_PASSWORD")
-	if rabbitPassword == "" {
-		rabbitPassword = "guest"
-	}
-
-	rabbitHost := os.Getenv("RABBIT_HOST")
-	if rabbitHost == "" {
-		rabbitHost = "localhost"
-	}
-
-	conn, err := amqp.Dial("amqp://" + rabbitUsername + ":" + rabbitPassword + "@" + rabbitHost + ":5672/")
+	conn, err := amqp.Dial("amqp://" + rabbitCreds["username"] + ":" + rabbitCreds["password"] + "@" + rabbitCreds["host"] + ":5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 	ch, err := conn.Channel()
@@ -74,12 +61,16 @@ func (consumer Consumer) InitializeConsumer() {
 	forever := make(chan bool)
 
 	go func() {
-		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
-			consumer.Handle(d)
+		for msg := range msgs {
+			err := consumer.Handler.Handle(msg)
+			if err != nil {
+				msg.Nack(false, true)
+			} else {
+				msg.Ack(false)
+			}
 		}
 	}()
 
-	log.Printf("Initialized queue (%s) bound to (%s) exchange, (%s) with binding key (%s)", consumer.QueueName, consumer.ExchangeKind, consumer.ExchangeName, consumer.QueueBinding)
+	log.Printf("Initialized queue: (%s) bound to %s-type exchange: (%s) with binding key: (%s)", consumer.QueueName, consumer.ExchangeKind, consumer.ExchangeName, consumer.QueueBinding)
 	<-forever
 }

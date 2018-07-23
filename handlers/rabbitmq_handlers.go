@@ -5,26 +5,38 @@ import (
 	"github.com/AITestingOrg/calculation-service/models"
 	"encoding/json"
 	"log"
-	"github.com/AITestingOrg/calculation-service/utils"
 	"time"
+	"errors"
+	"github.com/AITestingOrg/calculation-service/interfaces"
 )
 
-func GenericMessageReceived(msg amqp.Delivery){
-	log.Printf("Message received on exchange: %s\n\tWith routing key: %s\n\tWith body: %s", msg.Exchange, msg.RoutingKey, msg.Body)
+type RabbitHandlerInterface interface {
+	Handle(msg amqp.Delivery) error
 }
 
-func EstimateReceived(msg amqp.Delivery){
-	GenericMessageReceived(msg)
+type EstimateHandler struct {
+	Publisher interfaces.PublisherInterface
+}
+
+func (handler EstimateHandler) Handle(msg amqp.Delivery) error{
+	genericMessageReceived(msg)
 	data := msg.Body
 	var estimation models.Estimation
 	json.Unmarshal(data, &estimation)
-	estimate := CalculateCost(estimation)
-	log.Printf("Message received and unmarshaled into an estimation object: %s", estimation)
-	utils.PublishMessage("notification.exchange.notification", "notification.trip.estimatecalculated", estimate)
-	msg.Ack(false)
+	estimate := calculateCost(estimation)
+	err := handler.Publisher.PublishMessage("notification.exchange.notification", "notification.trip.estimatecalculated", estimate)
+	if err == nil {
+		return nil
+	} else {
+		return errors.New("error publishing message: " + err.Error())
+	}
 }
 
-func CalculateCost(gmapsEstimation models.Estimation) (models.Estimation) {
+func genericMessageReceived(msg amqp.Delivery){
+	log.Printf("Message received on exchange: %s\n\tWith routing key: %s\n\tWith body: %s", msg.Exchange, msg.RoutingKey, msg.Body)
+}
+
+func calculateCost(gmapsEstimation models.Estimation) (models.Estimation) {
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9

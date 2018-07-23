@@ -2,74 +2,80 @@ package utils
 
 import (
 	"github.com/streadway/amqp"
-	"os"
 	"log"
 	"encoding/json"
+	"errors"
 )
 
-var messagesChannel = make(chan Message)
-var notifyCloseChannel =  make(chan bool)
-var publishing = false
+type AmqpPublisher struct {
+	publishingChannel* amqp.Channel
+	closeSignal chan bool
+}
 
-func PublishMessage(exchangeName string, routingKey string, payload interface{}) {
+var(
+	staticPublisher = &AmqpPublisher{publishingChannel: nil, closeSignal: make(chan bool)}
+)
+
+func (publisher *AmqpPublisher) PublishMessage(exchangeName string, routingKey string, payload interface{}) error{
 	//Todo add some validation here
-	if(!publishing){
-		//throw an error about how they need to start another go-routine and run StartPublishingMessagesFromChannel
+	if staticPublisher.publishingChannel == nil {
+		return errors.New("publisher is not initialized, please call InitializePublisher() first")
 	}
 	encodedPayload, marshallErr := json.Marshal(payload)
 	if marshallErr != nil {
-		//do error handling
+		return errors.New("message was not published due to error marshalling payload: " + marshallErr.Error())
 	}
-	messagesChannel <- Message{exchangeName, routingKey, encodedPayload}
+	err := staticPublisher.publishingChannel.Publish(
+		exchangeName,
+		routingKey,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:       encodedPayload,
+		})
+	if err != nil {
+		return errors.New("Error publishing message: " + err.Error())
+	}
+	log.Printf("Published msg: " + string(encodedPayload) + " to exchange: " + exchangeName + " with key: " + routingKey)
+	return nil
 }
 
-func StopPublishingMessagesFromChannel() {
-	if publishing {
-		notifyCloseChannel <- true
-		publishing = false
+func (publisher *AmqpPublisher) StopPublisher() error{
+	if staticPublisher.publishingChannel != nil {
+		log.Printf("Sending signal to close channel and stop publisher")
+		staticPublisher.closeSignal <- true
+		return nil
 	} else {
-		//throw an error about how its not currently publishing
+		return errors.New("error stopping publisher, publisher not currently running")
 	}
 }
 
-func InitializeRabbitMqPublisher() {
-	rabbitUsername := os.Getenv("RABBIT_USERNAME")
-	if rabbitUsername == "" {
-		rabbitUsername = "guest"
-	}
+func (publisher *AmqpPublisher) InitializePublisher() error{
+	if staticPublisher.publishingChannel == nil {
+		log.Printf("Initializing publisher")
 
-	rabbitPassword := os.Getenv("RABBIT_PASSWORD")
-	if rabbitPassword == "" {
-		rabbitPassword = "guest"
-	}
+		rabbitCreds := GetRabbitCredentials()
 
-	rabbitHost := os.Getenv("RABBIT_HOST")
-	if rabbitHost == "" {
-		rabbitHost = "localhost"
-	}
-
-	conn, err := amqp.Dial("amqp://" + rabbitUsername + ":" + rabbitPassword + "@" + rabbitHost + ":5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	go func(){
-		for message := range messagesChannel {
-			err = ch.Publish(
-				message.ExchangeName,
-				message.RoutingKey,
-				false,
-				false,
-				amqp.Publishing{
-					ContentType: "text/plain",
-					Body:		 message.Message,
-				})
-			failOnError(err, "Failed to publish message")
-			log.Printf("Published msg: " + string(message.Message) + " to exchange: " + message.ExchangeName + " with key: " + message.RoutingKey)
+		conn, err := amqp.Dial("amqp://" + rabbitCreds["username"] + ":" + rabbitCreds["password"] + "@" + rabbitCreds["host"] + ":5672/")
+		if err != nil {
+			return errors.New("failed to connect to rabbitmq: " + err.Error())
 		}
-	}()
-	publishing = true
-	<-notifyCloseChannel
+		defer conn.Close()
+
+		ch, err := conn.Channel()
+		if err != nil {
+			return errors.New("failed to open channel on rabbitmq connection: " + err.Error())
+		}
+		defer ch.Close()
+
+		staticPublisher.publishingChannel = ch
+
+		<-staticPublisher.closeSignal//blocking until StopPublisher is called
+
+		staticPublisher.publishingChannel = nil
+		return nil
+	} else {
+		return errors.New("error initializing publisher, publisher already initialized")
+	}
 }
