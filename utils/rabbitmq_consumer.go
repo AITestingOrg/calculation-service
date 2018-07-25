@@ -1,17 +1,17 @@
 package utils
 
 import (
+	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/streadway/amqp"
 	"log"
-	"github.com/AITestingOrg/calculation-service/interfaces"
 )
 
 type AmqpConsumer struct {
 	ExchangeName string
 	ExchangeKind string
-	QueueName string
+	QueueName    string
 	QueueBinding string
-	Handler interfaces.RabbitHandlerInterface
+	Handler      interfaces.RabbitHandlerInterface
 }
 
 func (consumer AmqpConsumer) InitializeConsumer() {
@@ -43,9 +43,9 @@ func (consumer AmqpConsumer) InitializeConsumer() {
 		false,
 		nil,
 	)
-	failOnError(err, "Failed to declare the queue: " + q.Name )
+	failOnError(err, "Failed to declare the queue: "+q.Name)
 
-	ch.QueueBind(consumer.QueueName,consumer.QueueBinding,consumer.ExchangeName,false, nil)
+	ch.QueueBind(consumer.QueueName, consumer.QueueBinding, consumer.ExchangeName, false, nil)
 
 	msgs, err := ch.Consume(
 		q.Name,
