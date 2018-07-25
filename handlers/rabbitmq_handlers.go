@@ -60,12 +60,12 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 	currentDate := time.Now().Format("2006-01-02 03:04:05")
 
 	return models.Estimation{
-		Cost: 		 finalCost,
-		Duration: 	 int64(duration),
-		Distance: 	 distance,
-		Origin: 	 gmapsEstimation.Origin,
+		Cost:        finalCost,
+		Duration:    int64(duration),
+		Distance:    distance,
+		Origin:      gmapsEstimation.Origin,
 		Destination: gmapsEstimation.Destination,
 		LastUpdated: currentDate,
-		UserId: 	 gmapsEstimation.UserId,
+		UserId:      gmapsEstimation.UserId,
 	}
 }

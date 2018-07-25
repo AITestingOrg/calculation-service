@@ -23,7 +23,7 @@ func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request
 	json.Unmarshal(body, &trip)
 
 	log.Printf("Validating trip and estimation body...")
-	err := trip.ValidateFields("originAddress", "destinationAddress","userId")
+	err := trip.ValidateFields("originAddress", "destinationAddress", "userId")
 	if err != nil {
 		err = errors.New("ERROR: Invalid trip arguments:\n" + err.Error())
 		log.Print(err)

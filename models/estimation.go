@@ -14,7 +14,7 @@ type Estimation struct {
 	Duration    int64   `json:"duration"`
 	Cost        float64 `json:"cost"`
 	LastUpdated string  `json:"lastUpdated"`
-	UserId		string  `json:"userId"`
+	UserId      string  `json:"userId"`
 }
 
 func (estimation Estimation) ValidateFields(fields ...string) error {
@@ -105,7 +105,7 @@ func (estimation Estimation) ValidateLastUpdated() bool {
 //This is for Version 4, randomly generated, UUID's. Need to change if anything besides V4 is used in the future
 func (estimation Estimation) ValidateUserId() bool {
 	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
-	if (r.MatchString(estimation.UserId)){
+	if r.MatchString(estimation.UserId) {
 		return true
 	}
 	return false

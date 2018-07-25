@@ -1,16 +1,16 @@
 package tests
 
 import (
-	"testing"
+	"encoding/json"
+	"errors"
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/models"
-	"github.com/streadway/amqp"
-	"encoding/json"
 	"github.com/AITestingOrg/calculation-service/tests/mocks"
+	"github.com/streadway/amqp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"testing"
 	"time"
-	"errors"
 )
 
 func TestEstimateHandler_HappyCase(t *testing.T) {
@@ -21,9 +21,9 @@ func TestEstimateHandler_HappyCase(t *testing.T) {
 
 	lastUpdated := time.Now().Format("2006-01-02 03:04:05")
 	happyEstimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 3000}
-	var realDuration = float64(happyEstimate.Duration/ 60)
+	var realDuration = float64(happyEstimate.Duration / 60)
 	var realDistance = float64(int(happyEstimate.Distance/1609*100)) / 100
-	var cost = float64(int(((realDuration * 0.15)+(realDistance * 0.9))*100)) / 100
+	var cost = float64(int(((realDuration*0.15)+(realDistance*0.9))*100)) / 100
 	happyEstimateByteArray, _ := json.Marshal(happyEstimate)
 
 	estimationMatcher := mock.MatchedBy(func(estimation models.Estimation) bool {
@@ -35,7 +35,7 @@ func TestEstimateHandler_HappyCase(t *testing.T) {
 			estimation.Duration == int64(realDuration) &&
 			estimation.Cost == cost
 		return res
-		})
+	})
 
 	mockPublisher.Mock.On("PublishMessage", "notification.exchange.notification", "notification.trip.estimatecalculated", estimationMatcher).Return(nil)
 
@@ -54,9 +54,9 @@ func TestEstimateHandler_ZeroDistance(t *testing.T) {
 
 	lastUpdated := time.Now().Format("2006-01-02 03:04:05")
 	happyEstimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 0}
-	var realDuration = float64(happyEstimate.Duration/ 60)
+	var realDuration = float64(happyEstimate.Duration / 60)
 	var realDistance = float64(int(happyEstimate.Distance/1609*100)) / 100
-	var cost = float64(int(((realDuration * 0.15)+(realDistance * 0.9))*100)) / 100
+	var cost = float64(int(((realDuration*0.15)+(realDistance*0.9))*100)) / 100
 	happyEstimateByteArray, _ := json.Marshal(happyEstimate)
 
 	estimationMatcher := mock.MatchedBy(func(estimation models.Estimation) bool {
@@ -87,9 +87,9 @@ func TestEstimateHandler_ZeroDuration(t *testing.T) {
 
 	lastUpdated := time.Now().Format("2006-01-02 03:04:05")
 	happyEstimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 0, Distance: 3000}
-	var realDuration = float64(happyEstimate.Duration/ 60)
+	var realDuration = float64(happyEstimate.Duration / 60)
 	var realDistance = float64(int(happyEstimate.Distance/1609*100)) / 100
-	var cost = float64(int(((realDuration * 0.15)+(realDistance * 0.9))*100)) / 100
+	var cost = float64(int(((realDuration*0.15)+(realDistance*0.9))*100)) / 100
 	happyEstimateByteArray, _ := json.Marshal(happyEstimate)
 
 	estimationMatcher := mock.MatchedBy(func(estimation models.Estimation) bool {
@@ -120,9 +120,9 @@ func TestEstimateHandler_PublisherFailed(t *testing.T) {
 
 	lastUpdated := time.Now().Format("2006-01-02 03:04:05")
 	happyEstimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 3000}
-	var realDuration = float64(happyEstimate.Duration/ 60)
+	var realDuration = float64(happyEstimate.Duration / 60)
 	var realDistance = float64(int(happyEstimate.Distance/1609*100)) / 100
-	var cost = float64(int(((realDuration * 0.15)+(realDistance * 0.9))*100)) / 100
+	var cost = float64(int(((realDuration*0.15)+(realDistance*0.9))*100)) / 100
 	happyEstimateByteArray, _ := json.Marshal(happyEstimate)
 
 	estimationMatcher := mock.MatchedBy(func(estimation models.Estimation) bool {
@@ -161,7 +161,7 @@ func TestEstimateHandler_UnmarshalError(t *testing.T) {
 	err := handler.Handle(amqp.Delivery{Body: invalidEstimate})
 
 	//Assert
-	assert.Equal(t, errors.New("error unmarshalling data into an estimation object: " + expectedErr.Error()), err)
+	assert.Equal(t, errors.New("error unmarshalling data into an estimation object: "+expectedErr.Error()), err)
 }
 
 func TestEstimateHandler_InvalidOrigin(t *testing.T) {
@@ -179,7 +179,7 @@ func TestEstimateHandler_InvalidOrigin(t *testing.T) {
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
 
 	//Assert
-	assert.Equal(t, errors.New("error with the parsed estimation object: \n" + expectedErr.Error()), err)
+	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
 }
 
 func TestEstimateHandler_InvalidDestination(t *testing.T) {
@@ -197,7 +197,7 @@ func TestEstimateHandler_InvalidDestination(t *testing.T) {
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
 
 	//Assert
-	assert.Equal(t, errors.New("error with the parsed estimation object: \n" + expectedErr.Error()), err)
+	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
 }
 
 func TestEstimateHandler_InvalidDistance(t *testing.T) {
@@ -215,7 +215,7 @@ func TestEstimateHandler_InvalidDistance(t *testing.T) {
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
 
 	//Assert
-	assert.Equal(t, errors.New("error with the parsed estimation object: \n" + expectedErr.Error()), err)
+	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
 }
 
 func TestEstimateHandler_InvalidDuration(t *testing.T) {
@@ -233,7 +233,7 @@ func TestEstimateHandler_InvalidDuration(t *testing.T) {
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
 
 	//Assert
-	assert.Equal(t, errors.New("error with the parsed estimation object: \n" + expectedErr.Error()), err)
+	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
 }
 
 func TestEstimateHandler_InvalidUUID(t *testing.T) {
@@ -251,5 +251,5 @@ func TestEstimateHandler_InvalidUUID(t *testing.T) {
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
 
 	//Assert
-	assert.Equal(t, errors.New("error with the parsed estimation object: \n" + expectedErr.Error()), err)
+	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
 }

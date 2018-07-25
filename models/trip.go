@@ -10,7 +10,7 @@ type Trip struct {
 	Origin        string `json:"origin"`
 	Destination   string `json:"destination"`
 	DepartureTime int64  `json:"departureTime"`
-	UserId   	  string `json:"userId"`
+	UserId        string `json:"userId"`
 }
 
 func (trip Trip) ValidateFields(fields ...string) error {
