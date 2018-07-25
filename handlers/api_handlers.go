@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"net/http"
-	"io/ioutil"
-	"github.com/AITestingOrg/calculation-service/models"
 	"encoding/json"
-	"log"
 	"errors"
-	"time"
 	"github.com/AITestingOrg/calculation-service/interfaces"
+	"github.com/AITestingOrg/calculation-service/models"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
 )
 
 type CostEstimateHandler struct {
@@ -24,7 +24,7 @@ func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request
 
 	log.Printf("Validating trip and estimation body...")
 	err := trip.ValidateFields("originAddress", "destinationAddress","userId")
-	if (err != nil) {
+	if err != nil {
 		err = errors.New("ERROR: Invalid trip arguments:\n" + err.Error())
 		log.Print(err)
 		http.Error(w, err.Error(), 400)
@@ -47,10 +47,10 @@ func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request
 	w.Write([]byte("Trip Estimate Request Retrieved. Forwarding request to Gmaps Adapter"))
 }
 
-func (handler CostEstimateHandler) GetPath() string{
+func (handler CostEstimateHandler) GetPath() string {
 	return "/api/v1/cost"
 }
 
-func (handler CostEstimateHandler) GetRequestType() string{
+func (handler CostEstimateHandler) GetRequestType() string {
 	return "POST"
 }

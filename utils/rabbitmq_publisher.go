@@ -1,22 +1,22 @@
 package utils
 
 import (
-	"github.com/streadway/amqp"
-	"log"
 	"encoding/json"
 	"errors"
+	"github.com/streadway/amqp"
+	"log"
 )
 
 type AmqpPublisher struct {
-	publishingChannel* amqp.Channel
-	closeSignal chan bool
+	publishingChannel *amqp.Channel
+	closeSignal       chan bool
 }
 
-var(
+var (
 	staticPublisher = &AmqpPublisher{publishingChannel: nil, closeSignal: make(chan bool)}
 )
 
-func (publisher *AmqpPublisher) PublishMessage(exchangeName string, routingKey string, payload interface{}) error{
+func (publisher *AmqpPublisher) PublishMessage(exchangeName string, routingKey string, payload interface{}) error {
 	//Todo add some validation here
 	if staticPublisher.publishingChannel == nil {
 		return errors.New("publisher is not initialized, please call InitializePublisher() first")
@@ -32,7 +32,7 @@ func (publisher *AmqpPublisher) PublishMessage(exchangeName string, routingKey s
 		false,
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:       encodedPayload,
+			Body:        encodedPayload,
 		})
 	if err != nil {
 		return errors.New("Error publishing message: " + err.Error())
@@ -41,7 +41,7 @@ func (publisher *AmqpPublisher) PublishMessage(exchangeName string, routingKey s
 	return nil
 }
 
-func (publisher *AmqpPublisher) StopPublisher() error{
+func (publisher *AmqpPublisher) StopPublisher() error {
 	if staticPublisher.publishingChannel != nil {
 		log.Printf("Sending signal to close channel and stop publisher")
 		staticPublisher.closeSignal <- true
@@ -51,7 +51,7 @@ func (publisher *AmqpPublisher) StopPublisher() error{
 	}
 }
 
-func (publisher *AmqpPublisher) InitializePublisher() error{
+func (publisher *AmqpPublisher) InitializePublisher() error {
 	if staticPublisher.publishingChannel == nil {
 		log.Printf("Initializing publisher")
 
@@ -71,7 +71,7 @@ func (publisher *AmqpPublisher) InitializePublisher() error{
 
 		staticPublisher.publishingChannel = ch
 
-		<-staticPublisher.closeSignal//blocking until StopPublisher is called
+		<-staticPublisher.closeSignal //blocking until StopPublisher is called
 
 		staticPublisher.publishingChannel = nil
 		return nil

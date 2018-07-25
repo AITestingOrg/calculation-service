@@ -1,16 +1,16 @@
 package tests
 
 import (
-	"testing"
-	"github.com/AITestingOrg/calculation-service/tests/mocks"
-	"github.com/AITestingOrg/calculation-service/handlers"
-	"net/http/httptest"
-	"io/ioutil"
 	"bytes"
-	"github.com/AITestingOrg/calculation-service/models"
 	"encoding/json"
-	"github.com/stretchr/testify/mock"
+	"github.com/AITestingOrg/calculation-service/handlers"
+	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/AITestingOrg/calculation-service/tests/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"io/ioutil"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestCostEstimateHandler_HappyCase(t *testing.T) {
@@ -30,10 +30,10 @@ func TestCostEstimateHandler_HappyCase(t *testing.T) {
 			tripCheck.UserId == trip.UserId
 	})
 
-	mockPublisher.Mock.On("PublishMessage","trip.exchange.tripcalculation", "trip.estimation.estimaterequested", tripMatcher).Return(nil)
+	mockPublisher.Mock.On("PublishMessage", "trip.exchange.tripcalculation", "trip.estimation.estimaterequested", tripMatcher).Return(nil)
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
@@ -57,16 +57,16 @@ func TestCostEstimateHandler_EmptyOrigin(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	expectedErr := trip.ValidateFields("originAddress", "destinationAddress","userId")
-	assert.Equal(t, "ERROR: Invalid trip arguments:\n" + expectedErr.Error() + "\n", string(respBody))
-	mockPublisher.Mock.AssertNotCalled(t,"PublishMessage", mock.Anything, mock.Anything, mock.Anything)
+	expectedErr := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	assert.Equal(t, "ERROR: Invalid trip arguments:\n"+expectedErr.Error()+"\n", string(respBody))
+	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestCostEstimateHandler_EmptyDestination(t *testing.T) {
@@ -81,16 +81,16 @@ func TestCostEstimateHandler_EmptyDestination(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	expectedErr := trip.ValidateFields("originAddress", "destinationAddress","userId")
-	assert.Equal(t, "ERROR: Invalid trip arguments:\n" + expectedErr.Error() + "\n", string(respBody))
-	mockPublisher.Mock.AssertNotCalled(t,"PublishMessage", mock.Anything, mock.Anything, mock.Anything)
+	expectedErr := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	assert.Equal(t, "ERROR: Invalid trip arguments:\n"+expectedErr.Error()+"\n", string(respBody))
+	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestCostEstimateHandler_InvalidUserId(t *testing.T) {
@@ -104,18 +104,17 @@ func TestCostEstimateHandler_InvalidUserId(t *testing.T) {
 	mockRequest := httptest.NewRequest("POST", "/api/v1/cost", body)
 	w := httptest.NewRecorder()
 
-
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	expectedErr := trip.ValidateFields("originAddress", "destinationAddress","userId")
-	assert.Equal(t, "ERROR: Invalid trip arguments:\n" + expectedErr.Error() + "\n", string(respBody))
-	mockPublisher.Mock.AssertNotCalled(t,"PublishMessage", mock.Anything, mock.Anything, mock.Anything)
+	expectedErr := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	assert.Equal(t, "ERROR: Invalid trip arguments:\n"+expectedErr.Error()+"\n", string(respBody))
+	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestCostEstimateHandler_NonExistentOrigin(t *testing.T) {
@@ -128,7 +127,7 @@ func TestCostEstimateHandler_NonExistentOrigin(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
@@ -136,7 +135,7 @@ func TestCostEstimateHandler_NonExistentOrigin(t *testing.T) {
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
 	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid originAddress.\n\tGiven: \n\tExpected: Non Empty String\n\n", string(respBody))
-	mockPublisher.Mock.AssertNotCalled(t,"PublishMessage", mock.Anything, mock.Anything, mock.Anything)
+	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestCostEstimateHandler_NonExistentDestination(t *testing.T) {
@@ -149,7 +148,7 @@ func TestCostEstimateHandler_NonExistentDestination(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
@@ -157,7 +156,7 @@ func TestCostEstimateHandler_NonExistentDestination(t *testing.T) {
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
 	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid destinationAddress.\n\tGiven: \n\tExpected: Non Empty String\n\n", string(respBody))
-	mockPublisher.Mock.AssertNotCalled(t,"PublishMessage", mock.Anything, mock.Anything, mock.Anything)
+	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestCostEstimateHandler_NonExistentUserId(t *testing.T) {
@@ -170,7 +169,7 @@ func TestCostEstimateHandler_NonExistentUserId(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)
@@ -178,7 +177,7 @@ func TestCostEstimateHandler_NonExistentUserId(t *testing.T) {
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
 	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid userId.\n\tGiven: \n\tExpected: Valid UUID in version 4 format\n\n", string(respBody))
-	mockPublisher.Mock.AssertNotCalled(t,"PublishMessage", mock.Anything, mock.Anything, mock.Anything)
+	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestCostEstimateHandler_ExtraArgumentsProvided(t *testing.T) {
@@ -197,10 +196,10 @@ func TestCostEstimateHandler_ExtraArgumentsProvided(t *testing.T) {
 			tripCheck.DepartureTime != -1
 	})
 
-	mockPublisher.Mock.On("PublishMessage","trip.exchange.tripcalculation", "trip.estimation.estimaterequested", tripMatcher).Return(nil)
+	mockPublisher.Mock.On("PublishMessage", "trip.exchange.tripcalculation", "trip.estimation.estimaterequested", tripMatcher).Return(nil)
 
 	//Act
-	handler.Handle(w,mockRequest)
+	handler.Handle(w, mockRequest)
 
 	resp := w.Result()
 	respBody, _ := ioutil.ReadAll(resp.Body)

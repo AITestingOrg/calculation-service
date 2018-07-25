@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"log"
 	"fmt"
-	"os"
 	"github.com/AITestingOrg/calculation-service/interfaces"
+	"log"
+	"os"
 )
 
 func failOnError(err error, msg string) {
@@ -15,8 +15,8 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func InitializeRabbitMqConsumers(consumers ...interfaces.ConsumerInterface){
-	for _, consumer := range consumers{
+func InitializeRabbitMqConsumers(consumers ...interfaces.ConsumerInterface) {
+	for _, consumer := range consumers {
 		go consumer.InitializeConsumer()
 	}
 }

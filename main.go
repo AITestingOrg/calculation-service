@@ -4,8 +4,8 @@ import (
 	"github.com/AITestingOrg/calculation-service/controllers"
 	"github.com/AITestingOrg/calculation-service/eureka"
 	"github.com/AITestingOrg/calculation-service/handlers"
-	"github.com/AITestingOrg/calculation-service/utils"
 	"github.com/AITestingOrg/calculation-service/interfaces"
+	"github.com/AITestingOrg/calculation-service/utils"
 )
 
 func main() {
@@ -22,14 +22,14 @@ func main() {
 
 	go utils.InitializeRabbitMqConsumers(
 		utils.AmqpConsumer{
-		"trip.exchange.tripcalculation",
-		"topic",
-		"trip.queue.calculationservice.calculatecost",
-		"trip.estimation.estimatecalculated",
-		handlers.EstimateHandler{amqpPublisher},
+			"trip.exchange.tripcalculation",
+			"topic",
+			"trip.queue.calculationservice.calculatecost",
+			"trip.estimation.estimatecalculated",
+			handlers.EstimateHandler{amqpPublisher},
 		})
 
 	go amqpPublisher.InitializePublisher()
 
-	<- forever
+	<-forever
 }
