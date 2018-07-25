@@ -10,10 +10,6 @@ import (
 	"github.com/AITestingOrg/calculation-service/interfaces"
 )
 
-type RabbitHandlerInterface interface {
-	Handle(msg amqp.Delivery) error
-}
-
 type EstimateHandler struct {
 	Publisher interfaces.PublisherInterface
 }
@@ -22,14 +18,24 @@ func (handler EstimateHandler) Handle(msg amqp.Delivery) error{
 	genericMessageReceived(msg)
 	data := msg.Body
 	var estimation models.Estimation
-	json.Unmarshal(data, &estimation)
+	err := json.Unmarshal(data, &estimation)
+	if err != nil {
+		return errors.New("error unmarshalling data into an estimation object: " + err.Error())
+	}
+
+	err = estimation.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	if err != nil {
+		return errors.New("error with the parsed estimation object: \n" + err.Error())
+	}
+
 	estimate := calculateCost(estimation)
-	err := handler.Publisher.PublishMessage("notification.exchange.notification", "notification.trip.estimatecalculated", estimate)
-	if err == nil {
-		return nil
-	} else {
+
+	err = handler.Publisher.PublishMessage("notification.exchange.notification", "notification.trip.estimatecalculated", estimate)
+	if err != nil {
 		return errors.New("error publishing message: " + err.Error())
 	}
+
+	return nil
 }
 
 func genericMessageReceived(msg amqp.Delivery){

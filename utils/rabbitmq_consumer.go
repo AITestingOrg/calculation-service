@@ -3,7 +3,7 @@ package utils
 import (
 	"github.com/streadway/amqp"
 	"log"
-	"github.com/AITestingOrg/calculation-service/handlers"
+	"github.com/AITestingOrg/calculation-service/interfaces"
 )
 
 type AmqpConsumer struct {
@@ -11,7 +11,7 @@ type AmqpConsumer struct {
 	ExchangeKind string
 	QueueName string
 	QueueBinding string
-	Handler handlers.EstimateHandler
+	Handler interfaces.RabbitHandlerInterface
 }
 
 func (consumer AmqpConsumer) InitializeConsumer() {

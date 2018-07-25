@@ -43,7 +43,7 @@ func TestResponseStatusAndCost(t *testing.T) {
 	rr := httptest.NewRecorder()
 	log.Printf("Recording")
 
-	handler := http.HandlerFunc(controllers.GetCost)
+	handler := http.HandlerFunc(controllers.CostEstimateHandler{new(utils.AmqpPublisher)})
 	handler.ServeHTTP(rr, request)
 
 	var m map[string]interface{}

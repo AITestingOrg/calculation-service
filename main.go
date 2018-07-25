@@ -15,7 +15,7 @@ func main() {
 
 	forever := make(chan bool)
 	apiHandlers := []interfaces.ApiHandlerInterface{
-		controllers.CostEstimateHandler{Publisher: amqpPublisher}}
+		handlers.CostEstimateHandler{Publisher: amqpPublisher}}
 
 	controller := controllers.CalculationServiceController{apiHandlers}
 	go controller.InitializeEndpoint()
@@ -29,7 +29,7 @@ func main() {
 		handlers.EstimateHandler{amqpPublisher},
 		})
 
-	go new(utils.AmqpPublisher).InitializePublisher()
+	go amqpPublisher.InitializePublisher()
 
 	<- forever
 }
