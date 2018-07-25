@@ -18,7 +18,6 @@ script:
 - echo "running the script"
 - go build
 - docker-compose up --build -d
-- go get github.com/pact-foundation/pact-go
 - ./.travis.gofmt.sh
 - calculation_id=$(docker ps -aqf "name=calculationservice_calculationservice_1")
 - docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -v "
