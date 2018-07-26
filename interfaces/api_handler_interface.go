@@ -1,9 +1,9 @@
 package interfaces
 
-import "net/http"
+import (
+	"github.com/gorilla/mux"
+)
 
 type ApiHandlerInterface interface {
-	Handle(w http.ResponseWriter, r *http.Request)
-	GetPath() string
-	GetRequestType() string
+	AddHandlerToRouter(r *mux.Router)
 }

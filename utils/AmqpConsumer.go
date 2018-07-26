@@ -70,7 +70,6 @@ func (consumer AmqpConsumer) InitializeConsumer() {
 			}
 		}
 	}()
-
 	log.Printf("Initialized queue: (%s) bound to %s-type exchange: (%s) with binding key: (%s)", consumer.QueueName, consumer.ExchangeKind, consumer.ExchangeName, consumer.QueueBinding)
 	<-forever
 }

@@ -9,10 +9,15 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"github.com/gorilla/mux"
 )
 
 type CostEstimateHandler struct {
 	Publisher interfaces.PublisherInterface
+}
+
+func (handler CostEstimateHandler) AddHandlerToRouter(r * mux.Router) {
+	r.HandleFunc("/api/v1/cost", handler.Handle).Methods("POST")
 }
 
 func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
@@ -45,12 +50,4 @@ func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request
 	}
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte("Trip Estimate Request Retrieved. Forwarding request to Gmaps Adapter"))
-}
-
-func (handler CostEstimateHandler) GetPath() string {
-	return "/api/v1/cost"
-}
-
-func (handler CostEstimateHandler) GetRequestType() string {
-	return "POST"
 }
