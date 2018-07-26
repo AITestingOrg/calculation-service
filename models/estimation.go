@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 )
 
@@ -47,7 +46,7 @@ func (estimation Estimation) ValidateFields(fields ...string) error {
 			}
 		case "userId":
 			if !estimation.ValidateUserId() {
-				invalidFields += fmt.Sprintf("Invalid userId.\n\tGiven: %s\n\tExpected: Valid UUID in version 4 format\n", estimation.UserId)
+				invalidFields += fmt.Sprintf("Invalid userId.\n\tGiven: %s\n\tExpected: Non-empty UUID\n", estimation.UserId)
 			}
 		}
 	}
@@ -102,10 +101,8 @@ func (estimation Estimation) ValidateLastUpdated() bool {
 	return false
 }
 
-//This is for Version 4, randomly generated, UUID's. Need to change if anything besides V4 is used in the future
 func (estimation Estimation) ValidateUserId() bool {
-	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
-	if r.MatchString(estimation.UserId) {
+	if estimation.UserId != "" {
 		return true
 	}
 	return false

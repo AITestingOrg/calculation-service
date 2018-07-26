@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"regexp"
 )
 
 type Trip struct {
@@ -31,7 +30,7 @@ func (trip Trip) ValidateFields(fields ...string) error {
 			}
 		case "userId":
 			if !trip.ValidateUserId() {
-				invalidFields += fmt.Sprintf("Invalid userId.\n\tGiven: %s\n\tExpected: Valid UUID in version 4 format\n", trip.UserId)
+				invalidFields += fmt.Sprintf("Invalid userId.\n\tGiven: %s\n\tExpected: Non-empty UUID\n", trip.UserId)
 			}
 		}
 	}
@@ -62,10 +61,8 @@ func (trip Trip) ValidateDepartureTime() bool {
 	return false
 }
 
-//This is for Version 4, randomly generated, UUID's. Need to change if anything besides V4 is used in the future
 func (trip Trip) ValidateUserId() bool {
-	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
-	if r.MatchString(trip.UserId) {
+	if trip.UserId != "" {
 		return true
 	}
 	return false
