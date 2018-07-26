@@ -1,11 +1,11 @@
 package utils
 
 import (
-	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/eureka"
+	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/gorilla/mux"
-	"net/http"
 	"log"
+	"net/http"
 )
 
 func ProgramSetup(amqpPublisher interfaces.PublisherInterface, apiHandlers []interfaces.ApiHandlerInterface, amqpConsumers []interfaces.ConsumerInterface) {
