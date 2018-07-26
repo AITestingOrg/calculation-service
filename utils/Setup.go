@@ -22,7 +22,7 @@ func ProgramSetup(amqpPublisher interfaces.PublisherInterface, apiHandlers []int
 		}
 		http.Handle("/", r)
 		log.Fatal(http.ListenAndServe(":8080", nil))
-	} ()
+	}()
 
 	//initialize all of the rabbitmq consumers
 
