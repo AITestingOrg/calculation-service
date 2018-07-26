@@ -1,58 +1,27 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/AITestingOrg/calculation-service/controllers"
-	"github.com/AITestingOrg/calculation-service/eureka"
-
-	"github.com/gorilla/mux"
+	"github.com/AITestingOrg/calculation-service/handlers"
+	"github.com/AITestingOrg/calculation-service/interfaces"
+	"github.com/AITestingOrg/calculation-service/utils"
 )
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/api/v1/cost", controllers.GetCost).Methods("POST")
-	log.Println("Calculation service is running...")
+	//make an AmqpPublisher to be injected into the following methods
+	amqpPublisher := new(utils.AmqpPublisher)
 
-	//Check to see if running locally or not
-	var localRun = false
-	if os.Getenv("EUREKA_SERVER") == "" {
-		localRun = true
-	}
-	if !localRun {
-		var eurekaUp = false
-		log.Println("Waiting for Eureka...")
-		for eurekaUp != true {
-			eurekaUp = checkEurekaService(eurekaUp)
-		}
-		eureka.PostToEureka()
-		eureka.StartHeartbeat()
-	}
+	//make a list of api handlers that should all be added to a http controller
+	apiHandlers := []interfaces.ApiHandlerInterface{handlers.CostEstimateHandler{Publisher: amqpPublisher}}
 
-	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
-func checkEurekaService(eurekaUp bool) bool {
-	duration := time.Duration(15) * time.Second
-	time.Sleep(duration)
-	url := "http://discoveryservice:8761/eureka/"
-	log.Println("Sending request to Eureka, waiting for response...")
-	request, _ := http.NewRequest("GET", url, nil)
-	request.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	response, responseErr := client.Do(request)
-	if responseErr != nil {
-		log.Printf("No response from Eureka, retrying...")
-		return false
-	}
-	if response.Status != "204 No Content" {
-		log.Printf("Success, Eureka was found!")
-		return true
-	}
-	return false
+	//make a list of amqp consumers that should be consuming eventually
+	amqpConsumers := []interfaces.ConsumerInterface{
+		utils.AmqpConsumer{"trip.exchange.tripcalculation",
+			"topic",
+			"trip.queue.calculationservice.calculatecost",
+			"trip.estimation.estimatecalculated",
+			handlers.EstimateHandler{amqpPublisher},
+		}}
+	forever := make(chan bool)
+	go utils.ProgramSetup(amqpPublisher, apiHandlers, amqpConsumers)
+	<-forever
 }

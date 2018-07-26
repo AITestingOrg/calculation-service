@@ -37,13 +37,6 @@ With body:
 {
     "origin": "stringOrigin",
     "destination": "stringDestination"
+    "userId": "stringUUID"
 }
 ```
-
-## Running contract tests with pact:
-
-- Due to pact-go daemon issues in TravisCI the contract test are failing when run in  the pipeline. For now make sure they are ran locally following the instructions:
-1. Follow installation steps in the [guide](https://github.com/pact-foundation/pact-go) and make sure pact-go is recognized as a command.
-2. In the terminal cd into the tests folder.
-3. On a separate terminal run ```pact-go daemon```
-4. Run ```go test -v -run TestConsumer```

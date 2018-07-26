@@ -12,8 +12,45 @@ import (
 	"time"
 )
 
-func PostToEureka() {
-	var localIpAddr string = GetLocalIpAddress()
+func InitializeEurekaConnection() {
+	eurekaHost := os.Getenv("EUREKA_SERVER")
+	if eurekaHost == "" {
+		eurekaHost = "localhost"
+	}
+
+	var eurekaUp = false
+	log.Println("Waiting for Eureka...")
+	for eurekaUp != true {
+		eurekaUp = checkEurekaService(eurekaHost)
+	}
+	postToEureka(eurekaHost)
+	startHeartbeat(eurekaHost)
+	log.Printf("After scheduling heartbeat")
+}
+
+func checkEurekaService(eurekaHost string) bool {
+	url := fmt.Sprintf("http://%s:8761/eureka/", eurekaHost)
+
+	request, _ := http.NewRequest("GET", url, nil)
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	response, responseErr := client.Do(request)
+	if responseErr != nil {
+		log.Printf("Eureka not up. Waiting 5 seconds")
+		duration := time.Duration(15) * time.Second
+		time.Sleep(duration)
+		return false
+	}
+	if response.Status != "204 No Content" {
+		log.Printf("Success, Eureka was found")
+		return true
+	}
+	return false
+}
+
+func postToEureka(eurekaHost string) {
+	var localIpAddr = getLocalIpAddress()
 	jsonRequest := RequestBody{
 		Instance{
 			HostName:         localIpAddr,
@@ -38,11 +75,7 @@ func PostToEureka() {
 	}
 
 	log.Printf("Registering with Eureka...")
-	eureka := os.Getenv("EUREKA_SERVER")
-	if eureka == "" {
-		eureka = "discoveryservice"
-	}
-	url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice", eureka)
+	url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice", eurekaHost)
 	json := []byte(jsonParsed)
 
 	request, _ := http.NewRequest("POST", url, bytes.NewBuffer(json))
@@ -65,43 +98,13 @@ func PostToEureka() {
 	}
 }
 
-func CheckEurekaService(eurekaUp bool) bool {
-	duration := time.Duration(15) * time.Second
-	time.Sleep(duration)
-
-	eureka := os.Getenv("EUREKA_SERVER")
-	if eureka == "" {
-		eureka = "discoveryservice"
-	}
-	url := fmt.Sprintf("http://%s:8761/eureka/", eureka)
-
-	request, _ := http.NewRequest("GET", url, nil)
-	request.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	response, responseErr := client.Do(request)
-	if responseErr != nil {
-		log.Printf("Response error")
-		return false
-	}
-	if response.Status != "204 No Content" {
-		log.Printf("Success, Eureka was found")
-		return true
-	}
-	return false
-}
-
-func StartHeartbeat() {
+func startHeartbeat(eurekaHost string) {
 	log.Printf("Initializing heartbeat for every 30 seconds")
 	ticker := time.NewTicker(time.Second * 30)
 	go func() {
 		for range ticker.C {
 			log.Printf("Sending heartbeat to Eureka...")
-			eureka := os.Getenv("EUREKA_SERVER")
-			if eureka == "" {
-				eureka = "discoveryservice"
-			}
-			url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice/%s", eureka, GetLocalIpAddress())
+			url := fmt.Sprintf("http://%s:8761/eureka/apps/calculationservice/%s", eurekaHost, getLocalIpAddress())
 			request, _ := http.NewRequest("PUT", url, nil)
 			request.Header.Add("Content-Type", "application/json")
 			client := &http.Client{}
@@ -111,7 +114,7 @@ func StartHeartbeat() {
 	}()
 }
 
-func GetLocalIpAddress() string {
+func getLocalIpAddress() string {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		panic(err)
