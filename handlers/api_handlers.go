@@ -5,18 +5,18 @@ import (
 	"errors"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/models"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
-	"github.com/gorilla/mux"
 )
 
 type CostEstimateHandler struct {
 	Publisher interfaces.PublisherInterface
 }
 
-func (handler CostEstimateHandler) AddHandlerToRouter(r * mux.Router) {
+func (handler CostEstimateHandler) AddHandlerToRouter(r *mux.Router) {
 	r.HandleFunc("/api/v1/cost", handler.Handle).Methods("POST")
 }
 
