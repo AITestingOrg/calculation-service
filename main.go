@@ -2,16 +2,22 @@ package main
 
 import (
 	"github.com/AITestingOrg/calculation-service/handlers"
+	//"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/utils"
+	"github.com/AITestingOrg/calculation-service/db"
 )
 
 func main() {
 	//make an AmqpPublisher to be injected into the following methods
 	amqpPublisher := new(utils.AmqpPublisher)
 
+	//close mongo session
+	defer db.MgoSession.Close()
+
 	//make a list of api handlers that should all be added to a http controller
-	apiHandlers := []interfaces.ApiHandlerInterface{handlers.CostEstimateHandler{Publisher: amqpPublisher}}
+	apiHandlers := []interfaces.ApiHandlerInterface{handlers.CostEstimateHandler{Publisher: amqpPublisher},
+					handlers.CostStorage{Publisher: amqpPublisher}}
 
 	//make a list of amqp consumers that should be consuming eventually
 	amqpConsumers := []interfaces.ConsumerInterface{
