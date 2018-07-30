@@ -20,7 +20,6 @@ func ErrorWithJSON(w http.ResponseWriter, message string, code int) {
 	log.Printf( "{message: %q\nheader: }", message, w)
 }
 
-// Establish connection with db
 func init() {
 	session, err := mgo.Dial("mongo:27017")
 
@@ -31,14 +30,6 @@ func init() {
 	MgoSession = session
 }
 
-// Find a trip by it id
-//func (m *TripDao) FindById(id string) (models.Cost, error) {
-//	var cost Cost
-//	err := MgoSession.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&cost)
-//	return trip, err
-//}
-
-// Insert trip into database
 func addTrip(s *mgo.Session) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session := s.Copy()

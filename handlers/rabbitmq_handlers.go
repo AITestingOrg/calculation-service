@@ -46,7 +46,6 @@ func genericMessageReceived(msg amqp.Delivery) {
 }
 
 func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
-	//Copy Mongo session
 	session := db.MgoSession.Copy()
 	defer session.Close()
 	//Cost/Minute and Cost/Mile
@@ -65,14 +64,13 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 
 	currentDate := time.Now().Format("2006-01-02 03:04:05")
 
+	//Create cost object to be saved
 	var cost models.Cost
 	cost.Origin = gmapsEstimation.Origin
 	cost.UserId = gmapsEstimation.UserId
 	cost.DepartureTime = time.Now().Unix()
 	cost.Destination = gmapsEstimation.Destination
 	cost.Cost = finalCost
-	//Write cost to db
-	//upsetdata := bson.M{"$set": cost}
 	log.Println("Writing cost to database")
 	c := session.DB("TRIPCOST").C("costs")
 
