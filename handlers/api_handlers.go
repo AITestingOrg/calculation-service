@@ -10,9 +10,15 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"github.com/AITestingOrg/calculation-service/db"
+	"strings"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type CostEstimateHandler struct {
+	Publisher interfaces.PublisherInterface
+}
+type CostStorage struct {
 	Publisher interfaces.PublisherInterface
 }
 
@@ -20,10 +26,36 @@ func (handler CostEstimateHandler) AddHandlerToRouter(r *mux.Router) {
 	r.HandleFunc("/api/v1/cost", handler.Handle).Methods("POST")
 }
 
+func (handler CostStorage) AddHandlerToRouter(r *mux.Router) {
+	r.HandleFunc("/api/v1/cost/{id}", handler.Handle).Methods("GET")
+}
+
+func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
+	session := db.MgoSession.Copy()
+	defer session.Close()
+
+	if session == nil {
+		log.Println("session is Nil")
+	}
+
+	c := session.DB("TRIPCOST").C("costs")
+	param := strings.TrimPrefix(r.URL.Path, "/api/v1/cost/")
+	log.Println("GET parameter retreived: ", param)
+
+	var cost models.Cost
+	err := c.Find(bson.M{"userId": param}).Sort("-departureTime").Limit(1).One(&cost)
+
+	if err != nil {
+		log.Printf("Failed to find cost")
+	}
+	log.Printf("Found cost")
+	log.Println(cost.Origin, cost.Destination, cost.Cost, cost.DepartureTime)
+	return
+}
+
 func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-
-	//Converts objects into json
+//	//Converts objects into json
 	var trip models.Trip
 	json.Unmarshal(body, &trip)
 

@@ -8,6 +8,8 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 	"time"
+	"github.com/AITestingOrg/calculation-service/db"
+	"gopkg.in/mgo.v2"
 )
 
 type EstimateHandler struct {
@@ -43,6 +45,9 @@ func genericMessageReceived(msg amqp.Delivery) {
 }
 
 func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
+	//Copy Mongo session
+	session := db.MgoSession.Copy()
+	defer session.Close()
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9
@@ -58,6 +63,24 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 	var finalCost = float64(int((costDuration+costDistance)*100)) / 100
 
 	currentDate := time.Now().Format("2006-01-02 03:04:05")
+
+	//Set cost
+	var cost models.Cost
+	cost.Origin = gmapsEstimation.Origin
+	cost.UserId = gmapsEstimation.UserId
+	cost.DepartureTime = time.Now().Unix()
+	cost.Destination = gmapsEstimation.Destination
+	cost.Cost = finalCost
+		//End set cost
+		log.Println("Writing cost to database")
+		c := session.DB("TRIPCOST").C("costs")
+		log.Printf(cost.Destination, cost.DepartureTime)
+		err := c.Insert(cost)
+		if err != nil {
+			if mgo.IsDup(err) {
+				log.Printf("Error saving to database: %s", err)
+			}
+		}
 
 	return models.Estimation{
 		Cost:        finalCost,
