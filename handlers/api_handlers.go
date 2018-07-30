@@ -43,7 +43,7 @@ func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
 	log.Println("GET parameter retreived: ", param)
 
 	var cost models.Cost
-	err := c.Find(bson.M{"userId": param}).Sort("-departureTime").Limit(1).One(&cost)
+	err := c.Find(bson.M{"userId": param}).Limit(1).One(&cost)
 
 	if err != nil {
 		log.Printf("Failed to find cost")

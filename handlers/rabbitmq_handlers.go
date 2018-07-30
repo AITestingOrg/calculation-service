@@ -10,6 +10,7 @@ import (
 	"time"
 	"github.com/AITestingOrg/calculation-service/db"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type EstimateHandler struct {
@@ -64,23 +65,24 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 
 	currentDate := time.Now().Format("2006-01-02 03:04:05")
 
-	//Set cost
 	var cost models.Cost
 	cost.Origin = gmapsEstimation.Origin
 	cost.UserId = gmapsEstimation.UserId
 	cost.DepartureTime = time.Now().Unix()
 	cost.Destination = gmapsEstimation.Destination
 	cost.Cost = finalCost
-		//End set cost
-		log.Println("Writing cost to database")
-		c := session.DB("TRIPCOST").C("costs")
-		log.Printf(cost.Destination, cost.DepartureTime)
-		err := c.Insert(cost)
-		if err != nil {
-			if mgo.IsDup(err) {
-				log.Printf("Error saving to database: %s", err)
-			}
+	//Write cost to db
+	//upsetdata := bson.M{"$set": cost}
+	log.Println("Writing cost to database")
+	c := session.DB("TRIPCOST").C("costs")
+
+	_, err := c.Upsert(bson.M{"userId":cost.UserId},cost)
+
+	if err != nil {
+		if mgo.IsDup(err) {
+			log.Printf("Error saving to database: %s", err)
 		}
+	}
 
 	return models.Estimation{
 		Cost:        finalCost,
