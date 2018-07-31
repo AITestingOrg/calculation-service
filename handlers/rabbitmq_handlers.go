@@ -3,14 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/streadway/amqp"
-	"log"
-	"time"
-	"github.com/AITestingOrg/calculation-service/db"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
+	"time"
 )
 
 type EstimateHandler struct {
@@ -74,7 +74,7 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 	log.Println("Writing cost to database")
 	c := session.DB("TRIPCOST").C("costs")
 
-	_, err := c.Upsert(bson.M{"userId":cost.UserId},cost)
+	_, err := c.Upsert(bson.M{"userId": cost.UserId}, cost)
 
 	if err != nil {
 		if mgo.IsDup(err) {
@@ -92,4 +92,3 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 		UserId:      gmapsEstimation.UserId,
 	}
 }
-

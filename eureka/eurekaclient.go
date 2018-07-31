@@ -8,8 +8,8 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"time"
 	"os"
+	"time"
 )
 
 func InitializeEurekaConnection() {
@@ -111,7 +111,7 @@ func startHeartbeat(eurekaHost string) {
 			client.Do(request)
 			log.Printf("Heartbeat sent to Eureka")
 		}
-	} ()
+	}()
 }
 
 func getLocalIpAddress() string {

@@ -3,16 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
-	"github.com/AITestingOrg/calculation-service/db"
 	"strings"
-	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 type CostEstimateHandler struct {
@@ -49,13 +49,12 @@ func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to find cost")
 	}
 	log.Printf("Found cost")
-	log.Println(cost.Origin, cost.Destination, cost.Cost, cost.DepartureTime)
 	return
 }
 
 func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-//	//Converts objects into json
+	//	//Converts objects into json
 	var trip models.Trip
 	json.Unmarshal(body, &trip)
 

@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/handlers"
-	//"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/utils"
-	"github.com/AITestingOrg/calculation-service/db"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 
 	//make a list of api handlers that should all be added to a http controller
 	apiHandlers := []interfaces.ApiHandlerInterface{handlers.CostEstimateHandler{Publisher: amqpPublisher},
-					handlers.CostStorage{Publisher: amqpPublisher}}
+		handlers.CostStorage{Publisher: amqpPublisher}}
 
 	//make a list of amqp consumers that should be consuming eventually
 	amqpConsumers := []interfaces.ConsumerInterface{
