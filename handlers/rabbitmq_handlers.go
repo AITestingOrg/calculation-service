@@ -65,16 +65,15 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 	currentDate := time.Now().Format("2006-01-02 03:04:05")
 
 	//Create cost object to be saved
-	var cost models.Cost
-	cost.Origin = gmapsEstimation.Origin
-	cost.UserId = gmapsEstimation.UserId
-	cost.DepartureTime = time.Now().Unix()
-	cost.Destination = gmapsEstimation.Destination
-	cost.Cost = finalCost
 	log.Println("Writing cost to database")
 	c := session.DB("TRIPCOST").C("costs")
 
-	_, err := c.Upsert(bson.M{"userId": cost.UserId}, cost)
+	_, err := c.Upsert(bson.M{"userId": gmapsEstimation.UserId}, models.Cost{
+		UserId:      gmapsEstimation.UserId,
+		Origin:      gmapsEstimation.Origin,
+		Destination: gmapsEstimation.Destination,
+		Cost:        finalCost,
+	})
 
 	if err != nil {
 		if mgo.IsDup(err) {
