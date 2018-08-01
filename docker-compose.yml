@@ -15,7 +15,7 @@ services:
     depends_on:
       - discoveryservice
       - rabbitmq
-    build: ./
+    image: aista/calculation-service
     ports:
       - "8080"
     environment:
