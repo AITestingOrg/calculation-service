@@ -176,7 +176,7 @@ func TestCostEstimateHandler_NonExistentUserId(t *testing.T) {
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid userId.\n\tGiven: \n\tExpected: Valid UUID in version 4 format\n\n", string(respBody))
+	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid userId.\n\tGiven: \n\tExpected: Non-empty UUID\n\n", string(respBody))
 	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
