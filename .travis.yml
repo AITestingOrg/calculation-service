@@ -19,8 +19,9 @@ script:
 - go build
 - docker-compose up --build -d
 - ./.travis.gofmt.sh
-- calculation_id=$(docker ps -aqf "name=calculationservice_calculationservice_1")
-- docker exec -it $calculation_id bash -c "go get github.com/stretchr/testify/assert && cd tests && go test -v "
+- go get github.com/stretchr/testify/assert
+- cd tests
+- go test -v
 
 after_success:
 - export ACTUAL_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;
