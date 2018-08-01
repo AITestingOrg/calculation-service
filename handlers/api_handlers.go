@@ -11,15 +11,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 )
 
 type CostEstimateHandler struct {
 	Publisher interfaces.PublisherInterface
 }
+
 type CostStorage struct {
-	Publisher interfaces.PublisherInterface
+	Handler interfaces.ControllerInterface
 }
 
 func (handler CostEstimateHandler) AddHandlerToRouter(r *mux.Router) {
@@ -27,34 +27,36 @@ func (handler CostEstimateHandler) AddHandlerToRouter(r *mux.Router) {
 }
 
 func (handler CostStorage) AddHandlerToRouter(r *mux.Router) {
-	r.HandleFunc("/api/v1/cost/{id}", handler.Handle).Methods("GET")
+	r.HandleFunc("/api/v1/cost", handler.Handle).Methods("GET")
 }
 
 func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
 	session := db.MgoSession.Copy()
 	defer session.Close()
-
 	if session == nil {
 		log.Println("session is Nil")
 	}
 
 	c := session.DB("TRIPCOST").C("costs")
-	param := strings.TrimPrefix(r.URL.Path, "/api/v1/cost/")
-	log.Println("GET parameter retreived: ", param)
+	cost := models.Cost{}
+	errReq := json.NewDecoder(r.Body).Decode(&cost)
+	if errReq != nil {
+		panic(errReq)
+	}
 
-	var cost models.Cost
-	err := c.Find(bson.M{"userId": param}).Limit(1).One(&cost)
-
+	log.Println("GET request UUID retreived: ", cost.UserId)
+	err := c.Find(bson.M{"userId": cost.UserId}).Limit(1).One(&cost)
 	if err != nil {
 		log.Printf("Failed to find cost")
+	} else {
+		log.Printf("Found cost")
 	}
-	log.Printf("Found cost")
 	return
 }
 
 func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-	//	//Converts objects into json
+	//Converts objects into json
 	var trip models.Trip
 	json.Unmarshal(body, &trip)
 
