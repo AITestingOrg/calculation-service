@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/AITestingOrg/calculation-service/eureka"
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/utils"
-	"github.com/AITestingOrg/calculation-service/eureka"
 )
 
 func main() {

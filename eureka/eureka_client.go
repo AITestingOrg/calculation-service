@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-type EurekaClient struct {}
+type EurekaClient struct{}
 
 func (eureka EurekaClient) InitializeEurekaConnection() {
 	eurekaHost := os.Getenv("EUREKA_SERVER")
