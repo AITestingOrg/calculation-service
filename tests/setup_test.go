@@ -14,6 +14,7 @@ func TestProgramSetup(t *testing.T) {
 	mockConsumer1 := new(mocks.ConsumerInterface)
 	mockHandler2 := new(mocks.ApiHandlerInterface)
 	mockConsumer2 := new(mocks.ConsumerInterface)
+	mockEureka := new(mocks.EurekaClientInterface)
 	called := make(chan bool)
 
 	apiHandlers := []interfaces.ApiHandlerInterface{mockHandler1, mockHandler2}
@@ -24,8 +25,9 @@ func TestProgramSetup(t *testing.T) {
 	mockHandler1.On("AddHandlerToRouter", mock.Anything).Run(func(args mock.Arguments) { called <- true }).Return(nil)
 	mockConsumer2.On("InitializeConsumer").Run(func(args mock.Arguments) { called <- true }).Return(nil)
 	mockHandler2.On("AddHandlerToRouter", mock.Anything).Run(func(args mock.Arguments) { called <- true }).Return(nil)
+	mockEureka.On("InitializeEurekaConnection").Return(nil)
 
-	go utils.ProgramSetup(mockPublisher, apiHandlers, amqpConsumers)
+	go utils.ProgramSetup(mockPublisher, apiHandlers, amqpConsumers, mockEureka)
 
 	<-called
 	<-called
@@ -38,6 +40,7 @@ func TestProgramSetup(t *testing.T) {
 	mockHandler1.AssertExpectations(t)
 	mockConsumer2.AssertExpectations(t)
 	mockHandler2.AssertExpectations(t)
+	mockEureka.AssertExpectations(t)
 
 	close(called)
 }

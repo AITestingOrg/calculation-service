@@ -236,13 +236,13 @@ func TestEstimateHandler_InvalidDuration(t *testing.T) {
 	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
 }
 
-func TestEstimateHandler_InvalidUUID(t *testing.T) {
+func TestEstimateHandler_EmptyUUID(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
-	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "0", Duration: 3000, Distance: 3000}
+	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
 	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
