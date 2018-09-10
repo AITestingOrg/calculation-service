@@ -31,23 +31,27 @@ func (handler CostStorage) AddHandlerToRouter(r *mux.Router) {
 }
 
 func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
-	session := db.MgoSession.Copy()
+	session, err := db.Connect()
 	defer session.Close()
 	if session == nil {
-		log.Println("session is Nil")
+		log.Fatalf("No Session")
+		log.Println("session is Nil", err)
 	}
-
+	log.Println("Connecting to TRIPCOST database...")
 	c := session.DB("TRIPCOST").C("costs")
 	cost := models.Cost{}
-	errReq := json.NewDecoder(r.Body).Decode(&cost)
-	if errReq != nil {
-		panic(errReq)
+	errJson := json.NewDecoder(r.Body).Decode(&cost)
+	if errJson != nil {
+		panic(errJson)
 	}
 
 	log.Println("GET request UUID retreived: ", cost.UserId)
-	err := c.Find(bson.M{"userId": cost.UserId}).Limit(1).One(&cost)
+	err = c.Find(bson.M{"userId": cost.UserId}).Limit(1).One(&cost)
 	if err != nil {
-		log.Printf("Failed to find cost")
+		err = errors.New("Failed to find cost: " + err.Error())
+		log.Print(err)
+		http.Error(w, err.Error(), 404)
+		return
 	} else {
 		log.Printf("Found cost")
 	}

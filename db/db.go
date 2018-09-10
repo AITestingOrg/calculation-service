@@ -3,21 +3,29 @@ package db
 import (
 	"gopkg.in/mgo.v2"
 	"log"
+	"os"
 )
 
-type TripDao struct {
-	Server   string
-	Database string
+type Session struct {
+	MgoSession *mgo.Session
 }
 
-var MgoSession *mgo.Session
-
-func init() {
-	session, err := mgo.Dial("mongo:27017")
+func Connect() (*mgo.Session, error) {
+	mongo := os.Getenv("MONGO_HOST") + ":" + os.Getenv("MONGO_PORT")
+	session, err := mgo.Dial(mongo)
 
 	if err != nil {
-		log.Fatal("cannot dial mongo", err)
+		return nil, err
 	}
-	session.SetMode(mgo.Monotonic, true)
-	MgoSession = session
+
+	if session == nil {
+		log.Fatalf("No session")
+	}
+	return session, nil
+}
+
+func (s *Session) Close() {
+	if s.MgoSession != nil {
+		s.MgoSession.Close()
+	}
 }

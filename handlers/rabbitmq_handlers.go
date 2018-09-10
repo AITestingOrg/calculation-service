@@ -46,7 +46,7 @@ func genericMessageReceived(msg amqp.Delivery) {
 }
 
 func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
-	session := db.MgoSession.Copy()
+	session, err := db.Connect()
 	defer session.Close()
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
@@ -68,16 +68,16 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 	log.Println("Writing cost to database")
 	c := session.DB("TRIPCOST").C("costs")
 
-	_, err := c.Upsert(bson.M{"userId": gmapsEstimation.UserId}, models.Cost{
+	_, err2 := c.Upsert(bson.M{"userId": gmapsEstimation.UserId}, models.Cost{
 		UserId:      gmapsEstimation.UserId,
 		Origin:      gmapsEstimation.Origin,
 		Destination: gmapsEstimation.Destination,
 		Cost:        finalCost,
 	})
 
-	if err != nil {
+	if err2 != nil {
 		if mgo.IsDup(err) {
-			log.Printf("Error saving to database: %s", err)
+			log.Printf("Error saving to database: %s", err2)
 		}
 	}
 
