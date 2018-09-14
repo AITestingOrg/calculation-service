@@ -12,7 +12,9 @@ import (
 	"time"
 )
 
-func InitializeEurekaConnection() {
+type EurekaClient struct{}
+
+func (eureka EurekaClient) InitializeEurekaConnection() {
 	eurekaHost := os.Getenv("EUREKA_SERVER")
 	if eurekaHost == "" {
 		eurekaHost = "localhost"

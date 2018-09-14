@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/AITestingOrg/calculation-service/eureka"
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/utils"
@@ -23,6 +24,6 @@ func main() {
 			handlers.EstimateHandler{amqpPublisher},
 		}}
 	forever := make(chan bool)
-	go utils.ProgramSetup(amqpPublisher, apiHandlers, amqpConsumers)
+	go utils.ProgramSetup(amqpPublisher, apiHandlers, amqpConsumers, eureka.EurekaClient{})
 	<-forever
 }
