@@ -3,7 +3,6 @@ go:
 - '1.10'
 services:
 - docker
-- rabbitmq
 before_install:
 - echo "before the install"
 - echo "Testing Docker Hub credentials"
