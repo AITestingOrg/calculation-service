@@ -6,8 +6,8 @@ import (
 )
 
 type Trip struct {
-	Origin        string `json:"origin"`
-	Destination   string `json:"destination"`
+	Origin        string `json:"originAddress"`
+	Destination   string `json:"destinationAddress"`
 	DepartureTime int64  `json:"departureTime"`
 	UserId        string `json:"userId"`
 }

@@ -11,6 +11,11 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Idea
 .idea/
 .DS_Store
 calculation-service
+
+# VSCode
+.vscode
+debug*

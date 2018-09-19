@@ -3,14 +3,15 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/AITestingOrg/calculation-service/tests/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"io/ioutil"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestCostEstimateHandler_HappyCase(t *testing.T) {
@@ -122,7 +123,7 @@ func TestCostEstimateHandler_NonExistentOrigin(t *testing.T) {
 	mockPublisher := new(mocks.PublisherInterface)
 
 	handler := handlers.CostEstimateHandler{Publisher: mockPublisher}
-	tripBytes := bytes.NewBuffer([]byte("{\"destination\":\"Miami, Fl\",\"userId\":\"6dc35c49-0e20-4394-8fa1-2532a830067d\"}"))
+	tripBytes := bytes.NewBuffer([]byte("{\"destinationAddress\":\"Miami, Fl\",\"userId\":\"6dc35c49-0e20-4394-8fa1-2532a830067d\"}"))
 	mockRequest := httptest.NewRequest("POST", "/api/v1/cost", tripBytes)
 	w := httptest.NewRecorder()
 
@@ -143,7 +144,7 @@ func TestCostEstimateHandler_NonExistentDestination(t *testing.T) {
 	mockPublisher := new(mocks.PublisherInterface)
 
 	handler := handlers.CostEstimateHandler{Publisher: mockPublisher}
-	tripBytes := bytes.NewBuffer([]byte("{\"origin\":\"Weston, Fl\",\"userId\":\"6dc35c49-0e20-4394-8fa1-2532a830067d\"}"))
+	tripBytes := bytes.NewBuffer([]byte("{\"originAddress\":\"Weston, Fl\",\"userId\":\"6dc35c49-0e20-4394-8fa1-2532a830067d\"}"))
 	mockRequest := httptest.NewRequest("POST", "/api/v1/cost", tripBytes)
 	w := httptest.NewRecorder()
 
@@ -164,7 +165,7 @@ func TestCostEstimateHandler_NonExistentUserId(t *testing.T) {
 	mockPublisher := new(mocks.PublisherInterface)
 
 	handler := handlers.CostEstimateHandler{Publisher: mockPublisher}
-	tripBytes := bytes.NewBuffer([]byte("{\"origin\":\"Weston, Fl\",\"destination\":\"Miami, Fl\"}"))
+	tripBytes := bytes.NewBuffer([]byte("{\"originAddress\":\"Weston, Fl\",\"destinationAddress\":\"Miami, Fl\"}"))
 	mockRequest := httptest.NewRequest("POST", "/api/v1/cost", tripBytes)
 	w := httptest.NewRecorder()
 
@@ -185,7 +186,7 @@ func TestCostEstimateHandler_ExtraArgumentsProvided(t *testing.T) {
 	mockPublisher := new(mocks.PublisherInterface)
 
 	handler := handlers.CostEstimateHandler{Publisher: mockPublisher}
-	tripBytes := bytes.NewBuffer([]byte("{\"origin\":\"Weston, Fl\",\"destination\":\"Miami, Fl\",\"userId\":\"6dc35c49-0e20-4394-8fa1-2532a830067d\",\"departureTime\":-1}"))
+	tripBytes := bytes.NewBuffer([]byte("{\"originAddress\":\"Weston, Fl\",\"destinationAddress\":\"Miami, Fl\",\"userId\":\"6dc35c49-0e20-4394-8fa1-2532a830067d\",\"departureTime\":-1}"))
 	mockRequest := httptest.NewRequest("POST", "/api/v1/cost", tripBytes)
 	w := httptest.NewRecorder()
 
