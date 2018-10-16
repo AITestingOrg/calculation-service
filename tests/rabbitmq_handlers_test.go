@@ -3,14 +3,15 @@ package tests
 import (
 	"encoding/json"
 	"errors"
+	"testing"
+	"time"
+
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/AITestingOrg/calculation-service/tests/mocks"
 	"github.com/streadway/amqp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
-	"time"
 )
 
 func TestEstimateHandler_HappyCase(t *testing.T) {
@@ -173,7 +174,7 @@ func TestEstimateHandler_InvalidOrigin(t *testing.T) {
 	estimate := models.Estimation{Origin: "", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
 
 	//Act
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
@@ -191,7 +192,7 @@ func TestEstimateHandler_InvalidDestination(t *testing.T) {
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
 
 	//Act
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
@@ -209,7 +210,7 @@ func TestEstimateHandler_InvalidDistance(t *testing.T) {
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: -1}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
 
 	//Act
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
@@ -227,7 +228,7 @@ func TestEstimateHandler_InvalidDuration(t *testing.T) {
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: -1, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
 
 	//Act
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
@@ -245,7 +246,7 @@ func TestEstimateHandler_EmptyUUID(t *testing.T) {
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
 
 	//Act
 	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})

@@ -36,7 +36,7 @@ With body:
 ```json
 {
     "origin": "stringOrigin",
-    "destination": "stringDestination"
+    "destination": "stringDestination",
     "userId": "stringUUID"
 }
 ```
