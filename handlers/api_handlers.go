@@ -3,15 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"time"
 )
 
 type CostEstimateHandler struct {

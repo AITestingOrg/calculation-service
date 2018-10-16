@@ -3,14 +3,15 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"log"
+	"time"
+
 	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/streadway/amqp"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
-	"time"
 )
 
 type EstimateHandler struct {
@@ -26,7 +27,7 @@ func (handler EstimateHandler) Handle(msg amqp.Delivery) error {
 		return errors.New("error unmarshalling data into an estimation object: " + err.Error())
 	}
 
-	err = estimation.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	err = estimation.ValidateFields("origin", "destination", "distance", "duration", "userId")
 	if err != nil {
 		return errors.New("error with the parsed estimation object: \n" + err.Error())
 	}

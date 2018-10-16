@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"log"
+
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/streadway/amqp"
-	"log"
 )
 
 type AmqpConsumer struct {
@@ -25,36 +26,36 @@ func (consumer AmqpConsumer) InitializeConsumer() {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		consumer.ExchangeName,
-		consumer.ExchangeKind,
-		true,
-		false,
-		false,
-		false,
-		nil,
+		consumer.ExchangeName, // name
+		consumer.ExchangeKind, // kind
+		true,  // durable
+		false, // auto-deleted
+		false, // internal
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare an exchange")
 
 	q, err := ch.QueueDeclare(
-		consumer.QueueName,
-		false,
-		true,
-		false,
-		false,
-		nil,
+		consumer.QueueName, // name of the queue
+		false,              // durable
+		true,               // delete when usused
+		false,              // exclusive
+		false,              // noWait
+		nil,                // arguments
 	)
 	failOnError(err, "Failed to declare the queue: "+q.Name)
 
 	ch.QueueBind(consumer.QueueName, consumer.QueueBinding, consumer.ExchangeName, false, nil)
 
 	msgs, err := ch.Consume(
-		q.Name,
-		"",
-		false,
-		false,
-		false,
-		false,
-		nil,
+		q.Name, // name
+		"",     // consumerTag
+		false,  // noAck
+		false,  // exclusive
+		false,  // noLocal
+		false,  // noWait
+		nil,    // arguments
 	)
 	failOnError(err, "Failed to register a consumer")
 
