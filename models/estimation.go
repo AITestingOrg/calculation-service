@@ -7,8 +7,8 @@ import (
 )
 
 type Estimation struct {
-	Origin      string  `json:"originAddress"`
-	Destination string  `json:"destinationAddress"`
+	Origin      string  `json:"origin"`
+	Destination string  `json:"destination"`
 	Distance    float64 `json:"distance"`
 	Duration    int64   `json:"duration"`
 	Cost        float64 `json:"cost"`
@@ -20,13 +20,13 @@ func (estimation Estimation) ValidateFields(fields ...string) error {
 	invalidFields := ""
 	for _, field := range fields {
 		switch field {
-		case "originAddress":
+		case "origin":
 			if !estimation.ValidateOrigin() {
-				invalidFields += fmt.Sprintf("Invalid originAddress.\n\tGiven: %s\n\tExpected: Non Empty String\n", estimation.Origin)
+				invalidFields += fmt.Sprintf("Invalid origin.\n\tGiven: %s\n\tExpected: Non Empty String\n", estimation.Origin)
 			}
-		case "destinationAddress":
+		case "destination":
 			if !estimation.ValidateDestination() {
-				invalidFields += fmt.Sprintf("Invalid destinationAddress.\n\tGiven: %s\n\tExpected: Non Empty String\n", estimation.Destination)
+				invalidFields += fmt.Sprintf("Invalid destination.\n\tGiven: %s\n\tExpected: Non Empty String\n", estimation.Destination)
 			}
 		case "distance":
 			if !estimation.ValidateDistance() {

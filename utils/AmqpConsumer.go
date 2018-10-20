@@ -3,6 +3,7 @@ package utils
 import (
 	"log"
 
+	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
 	"github.com/streadway/amqp"
 )
@@ -62,13 +63,20 @@ func (consumer AmqpConsumer) InitializeConsumer() {
 	forever := make(chan bool)
 
 	go func() {
-		for msg := range msgs {
-			err := consumer.Handler.Handle(msg)
-			if err != nil {
-				msg.Nack(false, true)
-			} else {
-				msg.Ack(false)
+		session, err := db.NewMongoDAL("TRIPCOST")
+		defer session.Close()
+
+		if err == nil {
+			for msg := range msgs {
+				err := consumer.Handler.Handle(msg, session)
+				if err != nil {
+					msg.Nack(false, true)
+				} else {
+					msg.Ack(true)
+				}
 			}
+		} else {
+			log.Printf("Error connecting to MongoDB. Error message: %s", err)
 		}
 	}()
 	log.Printf("Initialized queue: (%s) bound to %s-type exchange: (%s) with binding key: (%s)", consumer.QueueName, consumer.ExchangeKind, consumer.ExchangeName, consumer.QueueBinding)

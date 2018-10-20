@@ -19,7 +19,7 @@ type CostEstimateHandler struct {
 	Publisher interfaces.PublisherInterface
 }
 
-type CostStorage struct {
+type GetCostHandler struct {
 	Handler interfaces.ControllerInterface
 }
 
@@ -27,19 +27,20 @@ func (handler CostEstimateHandler) AddHandlerToRouter(r *mux.Router) {
 	r.HandleFunc("/api/v1/cost", handler.Handle).Methods("POST")
 }
 
-func (handler CostStorage) AddHandlerToRouter(r *mux.Router) {
+func (handler GetCostHandler) AddHandlerToRouter(r *mux.Router) {
 	r.HandleFunc("/api/v1/cost", handler.Handle).Methods("GET")
 }
 
-func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
-	session, err := db.Connect()
+// Retrieve cost estimate
+func (handler GetCostHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	session, err := db.NewMongoDAL("TRIPCOST")
 	defer session.Close()
 	if session == nil {
 		log.Fatalf("No Session")
 		log.Println("session is Nil", err)
 	}
 	log.Println("Connecting to TRIPCOST database...")
-	c := session.DB("TRIPCOST").C("costs")
+	c := session.C("costs")
 	cost := models.Cost{}
 	errJson := json.NewDecoder(r.Body).Decode(&cost)
 	if errJson != nil {
@@ -59,6 +60,7 @@ func (handler CostStorage) Handle(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// Handle new cost estimate calculation
 func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	//Converts objects into json
@@ -66,7 +68,7 @@ func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request
 	json.Unmarshal(body, &trip)
 
 	log.Printf("Validating trip and estimation body...")
-	err := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	err := trip.ValidateFields("origin", "destination", "userId")
 	if err != nil {
 		err = errors.New("ERROR: Invalid trip arguments:\n" + err.Error())
 		log.Print(err)

@@ -13,7 +13,7 @@ func main() {
 
 	//make a list of api handlers that should all be added to a http controller
 	apiHandlers := []interfaces.ApiHandlerInterface{handlers.CostEstimateHandler{Publisher: amqpPublisher},
-		handlers.CostStorage{}}
+		handlers.GetCostHandler{}}
 
 	//make a list of amqp consumers that should be consuming eventually
 	amqpConsumers := []interfaces.ConsumerInterface{

@@ -6,11 +6,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/AITestingOrg/calculation-service/db"
 	"github.com/AITestingOrg/calculation-service/interfaces"
+	"github.com/AITestingOrg/calculation-service/interfaces/data"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/streadway/amqp"
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -18,7 +17,7 @@ type EstimateHandler struct {
 	Publisher interfaces.PublisherInterface
 }
 
-func (handler EstimateHandler) Handle(msg amqp.Delivery) error {
+func (handler EstimateHandler) Handle(msg amqp.Delivery, session data.DataAccessInterface) error {
 	genericMessageReceived(msg)
 	data := msg.Body
 	var estimation models.Estimation
@@ -32,7 +31,7 @@ func (handler EstimateHandler) Handle(msg amqp.Delivery) error {
 		return errors.New("error with the parsed estimation object: \n" + err.Error())
 	}
 
-	estimate := calculateCost(estimation)
+	estimate := calculateCost(estimation, session)
 
 	err = handler.Publisher.PublishMessage("notification.exchange.notification", "notification.trip.estimatecalculated", estimate)
 	if err != nil {
@@ -46,9 +45,9 @@ func genericMessageReceived(msg amqp.Delivery) {
 	log.Printf("Message received on exchange: %s\n\tWith routing key: %s\n\tWith body: %s", msg.Exchange, msg.RoutingKey, msg.Body)
 }
 
-func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
-	session, err := db.Connect()
-	defer session.Close()
+func calculateCost(gmapsEstimation models.Estimation, session data.DataAccessInterface) models.Estimation {
+	//session, err := db.NewMongoDAL("TRIPCOST")
+	//defer session.Close()
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9
@@ -67,19 +66,23 @@ func calculateCost(gmapsEstimation models.Estimation) models.Estimation {
 
 	//Create cost object to be saved
 	log.Println("Writing cost to database")
-	c := session.DB("TRIPCOST").C("costs")
+	c := session.C("costs")
 
-	_, err2 := c.Upsert(bson.M{"userId": gmapsEstimation.UserId}, models.Cost{
-		UserId:      gmapsEstimation.UserId,
-		Origin:      gmapsEstimation.Origin,
-		Destination: gmapsEstimation.Destination,
-		Cost:        finalCost,
-	})
+	if c != nil {
+		_, err2 := c.Upsert(bson.M{"userId": gmapsEstimation.UserId}, models.Cost{
+			UserId:      gmapsEstimation.UserId,
+			Origin:      gmapsEstimation.Origin,
+			Destination: gmapsEstimation.Destination,
+			Cost:        finalCost,
+		})
 
-	if err2 != nil {
-		if mgo.IsDup(err) {
+		if err2 != nil {
+			//if mgo.IsDup(err) {
 			log.Printf("Error saving to database: %s", err2)
+			//}
 		}
+	} else {
+		log.Printf("No registries found in database.")
 	}
 
 	return models.Estimation{
