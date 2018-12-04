@@ -63,6 +63,7 @@ func (handler GetCostHandler) Handle(w http.ResponseWriter, r *http.Request) {
 // Handle new cost estimate calculation
 func (handler CostEstimateHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
+	
 	//Converts objects into json
 	var trip models.Trip
 	json.Unmarshal(body, &trip)

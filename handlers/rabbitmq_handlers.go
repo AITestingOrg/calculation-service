@@ -46,8 +46,7 @@ func genericMessageReceived(msg amqp.Delivery) {
 }
 
 func calculateCost(gmapsEstimation models.Estimation, session data.DataAccessInterface) models.Estimation {
-	//session, err := db.NewMongoDAL("TRIPCOST")
-	//defer session.Close()
+	
 	//Cost/Minute and Cost/Mile
 	var costPerMinute = 0.15
 	var costPerMile = 0.9
@@ -77,9 +76,7 @@ func calculateCost(gmapsEstimation models.Estimation, session data.DataAccessInt
 		})
 
 		if err2 != nil {
-			//if mgo.IsDup(err) {
 			log.Printf("Error saving to database: %s", err2)
-			//}
 		}
 	} else {
 		log.Printf("No registries found in database.")
