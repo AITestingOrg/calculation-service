@@ -36,7 +36,11 @@ With body:
 ```json
 {
     "origin": "stringOrigin",
-    "destination": "stringDestination"
+    "destination": "stringDestination",
     "userId": "stringUUID"
 }
 ```
+
+#### GET to api/v1/cost/{UUID}
+
+This endpoint will retreive cost in the database associated with username {UUID}.

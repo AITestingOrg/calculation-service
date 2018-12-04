@@ -3,14 +3,15 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/AITestingOrg/calculation-service/tests/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"io/ioutil"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestCostEstimateHandler_HappyCase(t *testing.T) {
@@ -64,7 +65,7 @@ func TestCostEstimateHandler_EmptyOrigin(t *testing.T) {
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	expectedErr := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	expectedErr := trip.ValidateFields("origin", "destination", "userId")
 	assert.Equal(t, "ERROR: Invalid trip arguments:\n"+expectedErr.Error()+"\n", string(respBody))
 	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
@@ -88,7 +89,7 @@ func TestCostEstimateHandler_EmptyDestination(t *testing.T) {
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	expectedErr := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	expectedErr := trip.ValidateFields("origin", "destination", "userId")
 	assert.Equal(t, "ERROR: Invalid trip arguments:\n"+expectedErr.Error()+"\n", string(respBody))
 	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
@@ -112,7 +113,7 @@ func TestCostEstimateHandler_InvalidUserId(t *testing.T) {
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	expectedErr := trip.ValidateFields("originAddress", "destinationAddress", "userId")
+	expectedErr := trip.ValidateFields("origin", "destination", "userId")
 	assert.Equal(t, "ERROR: Invalid trip arguments:\n"+expectedErr.Error()+"\n", string(respBody))
 	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
@@ -134,7 +135,7 @@ func TestCostEstimateHandler_NonExistentOrigin(t *testing.T) {
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid originAddress.\n\tGiven: \n\tExpected: Non Empty String\n\n", string(respBody))
+	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid origin.\n\tGiven: \n\tExpected: Non Empty String\n\n", string(respBody))
 	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 
@@ -155,7 +156,7 @@ func TestCostEstimateHandler_NonExistentDestination(t *testing.T) {
 
 	//Assert
 	assert.Equal(t, 400, resp.StatusCode)
-	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid destinationAddress.\n\tGiven: \n\tExpected: Non Empty String\n\n", string(respBody))
+	assert.Equal(t, "ERROR: Invalid trip arguments:\nInvalid destination.\n\tGiven: \n\tExpected: Non Empty String\n\n", string(respBody))
 	mockPublisher.Mock.AssertNotCalled(t, "PublishMessage", mock.Anything, mock.Anything, mock.Anything)
 }
 

@@ -16,13 +16,13 @@ func (trip Trip) ValidateFields(fields ...string) error {
 	invalidFields := ""
 	for _, field := range fields {
 		switch field {
-		case "originAddress":
+		case "origin":
 			if !trip.ValidateOrigin() {
-				invalidFields += fmt.Sprintf("Invalid originAddress.\n\tGiven: %s\n\tExpected: Non Empty String\n", trip.Origin)
+				invalidFields += fmt.Sprintf("Invalid origin.\n\tGiven: %s\n\tExpected: Non Empty String\n", trip.Origin)
 			}
-		case "destinationAddress":
+		case "destination":
 			if !trip.ValidateDestination() {
-				invalidFields += fmt.Sprintf("Invalid destinationAddress.\n\tGiven: %s\n\tExpected: Non Empty String\n", trip.Destination)
+				invalidFields += fmt.Sprintf("Invalid destination.\n\tGiven: %s\n\tExpected: Non Empty String\n", trip.Destination)
 			}
 		case "departureTime":
 			if !trip.ValidateDepartureTime() {

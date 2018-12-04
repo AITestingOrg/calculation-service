@@ -3,19 +3,25 @@ package tests
 import (
 	"encoding/json"
 	"errors"
+	"testing"
+	"time"
+
 	"github.com/AITestingOrg/calculation-service/handlers"
 	"github.com/AITestingOrg/calculation-service/models"
 	"github.com/AITestingOrg/calculation-service/tests/mocks"
 	"github.com/streadway/amqp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
-	"time"
 )
+
+type Payload struct {
+	Cost float64
+}
 
 func TestEstimateHandler_HappyCase(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
@@ -38,9 +44,10 @@ func TestEstimateHandler_HappyCase(t *testing.T) {
 	})
 
 	mockPublisher.Mock.On("PublishMessage", "notification.exchange.notification", "notification.trip.estimatecalculated", estimationMatcher).Return(nil)
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, err, nil)
@@ -49,6 +56,7 @@ func TestEstimateHandler_HappyCase(t *testing.T) {
 func TestEstimateHandler_ZeroDistance(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
@@ -71,9 +79,10 @@ func TestEstimateHandler_ZeroDistance(t *testing.T) {
 	})
 
 	mockPublisher.Mock.On("PublishMessage", "notification.exchange.notification", "notification.trip.estimatecalculated", estimationMatcher).Return(nil)
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, err, nil)
@@ -82,6 +91,7 @@ func TestEstimateHandler_ZeroDistance(t *testing.T) {
 func TestEstimateHandler_ZeroDuration(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
@@ -104,9 +114,10 @@ func TestEstimateHandler_ZeroDuration(t *testing.T) {
 	})
 
 	mockPublisher.Mock.On("PublishMessage", "notification.exchange.notification", "notification.trip.estimatecalculated", estimationMatcher).Return(nil)
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, err, nil)
@@ -115,6 +126,7 @@ func TestEstimateHandler_ZeroDuration(t *testing.T) {
 func TestEstimateHandler_PublisherFailed(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
@@ -139,9 +151,10 @@ func TestEstimateHandler_PublisherFailed(t *testing.T) {
 	mockErr := errors.New("error Message")
 	mockPublisher.Mock.On("PublishMessage", "notification.exchange.notification", "notification.trip.estimatecalculated", estimationMatcher).Return(mockErr)
 	mockErr = errors.New("error publishing message: " + mockErr.Error())
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: happyEstimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, mockErr, err)
@@ -150,6 +163,7 @@ func TestEstimateHandler_PublisherFailed(t *testing.T) {
 func TestEstimateHandler_UnmarshalError(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
@@ -157,8 +171,10 @@ func TestEstimateHandler_UnmarshalError(t *testing.T) {
 	var estimate models.Estimation
 	expectedErr := json.Unmarshal(invalidEstimate, &estimate)
 
+	mockMongo.Mock.On("C", "costs").Return(nil)
+
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: invalidEstimate})
+	err := handler.Handle(amqp.Delivery{Body: invalidEstimate}, mockMongo)
 
 	//Assert
 	assert.Equal(t, errors.New("error unmarshalling data into an estimation object: "+expectedErr.Error()), err)
@@ -167,16 +183,19 @@ func TestEstimateHandler_UnmarshalError(t *testing.T) {
 func TestEstimateHandler_InvalidOrigin(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
 	estimate := models.Estimation{Origin: "", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
+
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: estimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
@@ -185,16 +204,19 @@ func TestEstimateHandler_InvalidOrigin(t *testing.T) {
 func TestEstimateHandler_InvalidDestination(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
+
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: estimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
@@ -203,16 +225,19 @@ func TestEstimateHandler_InvalidDestination(t *testing.T) {
 func TestEstimateHandler_InvalidDistance(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: 3000, Distance: -1}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
+
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: estimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
@@ -221,16 +246,19 @@ func TestEstimateHandler_InvalidDistance(t *testing.T) {
 func TestEstimateHandler_InvalidDuration(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "6e012898-8a5b-4959-92d6-8b7d669384b4", Duration: -1, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
+
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: estimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
@@ -239,16 +267,19 @@ func TestEstimateHandler_InvalidDuration(t *testing.T) {
 func TestEstimateHandler_EmptyUUID(t *testing.T) {
 	//Arrange
 	mockPublisher := new(mocks.PublisherInterface)
+	mockMongo := new(mocks.DataAccessInterface)
 
 	handler := handlers.EstimateHandler{Publisher: mockPublisher}
 
 	estimate := models.Estimation{Origin: "Weston, Fl", Destination: "Miami, Fl", UserId: "", Duration: 3000, Distance: 3000}
 	estimateByteArray, _ := json.Marshal(estimate)
 
-	expectedErr := estimate.ValidateFields("originAddress", "destinationAddress", "distance", "duration", "userId")
+	expectedErr := estimate.ValidateFields("origin", "destination", "distance", "duration", "userId")
+
+	mockMongo.Mock.On("C", "costs").Return(nil)
 
 	//Act
-	err := handler.Handle(amqp.Delivery{Body: estimateByteArray})
+	err := handler.Handle(amqp.Delivery{Body: estimateByteArray}, mockMongo)
 
 	//Assert
 	assert.Equal(t, errors.New("error with the parsed estimation object: \n"+expectedErr.Error()), err)
